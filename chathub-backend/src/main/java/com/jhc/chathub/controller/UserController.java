@@ -1,26 +1,43 @@
 package com.jhc.chathub.controller;
 
-import com.jhc.chathub.common.enums.ErrorStatus;
 import com.jhc.chathub.common.resp.Response;
+import com.jhc.chathub.pojo.dto.LoginFormDTO;
+import com.jhc.chathub.pojo.dto.PhoneLoginFormDTO;
+import com.jhc.chathub.pojo.dto.RegisterFormDTO;
+import com.jhc.chathub.service.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.annotation.Resource;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
 @Tag(name = "用户相关接口")
 public class UserController {
-    @Operation(summary = "用户登录")
+    @Resource
+    private IUserService userService;
+
     @PostMapping("/login")
-    public Response<String> login() {
-        return Response.success("登录成功");
+    @Operation(summary = "账号密码登录")
+    public Response<String> login(@RequestBody LoginFormDTO loginForm) {
+        return userService.login(loginForm);
     }
 
-    @Operation(summary = "用户注册")
+    @GetMapping("/phone_code/{phone}")
+    @Operation(summary = "获取手机验证码")
+    public Response<Void> phoneCode(@PathVariable("phone") String phone) {
+        return userService.phoneCode(phone);
+    }
+
+    @PostMapping("/phone_login")
+    @Operation(summary = "手机验证码登录")
+    public Response<String> phoneLogin(@RequestBody PhoneLoginFormDTO phoneLoginForm) {
+        return userService.phoneLogin(phoneLoginForm);
+    }
+
     @PostMapping("/register")
-    public Response<Void> register() {
-        return Response.fail(ErrorStatus.SERVER_ERROR);
+    @Operation(summary = "用户注册")
+    public Response<String> register(@RequestBody RegisterFormDTO registerForm) {
+        return userService.register(registerForm);
     }
 }

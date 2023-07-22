@@ -1,5 +1,6 @@
 package com.jhc.chathub.common.resp;
 
+import com.jhc.chathub.common.constants.SystemConstant;
 import com.jhc.chathub.common.enums.ErrorStatus;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -12,10 +13,14 @@ public class Response<T> {
     private T data;
     public static <T> Response<T> success(T data) {
         Response<T> response = new Response<>();
-        return response.setStatusCode(0).setStatusMsg("成功").setData(data);
+        return response.setStatusCode(SystemConstant.SUCCESS_REQUEST).setStatusMsg("成功").setData(data);
     }
     public static <T> Response<T> fail(ErrorStatus errorStatus) {
         Response<T> response = new Response<>();
         return response.setStatusCode(errorStatus.getCode()).setStatusMsg(errorStatus.getMessage());
+    }
+    public static <T> Response<T> fail(String errorMsg) {
+        Response<T> response = new Response<>();
+        return response.setStatusCode(SystemConstant.COMMON_ERROR).setStatusMsg(errorMsg);
     }
 }

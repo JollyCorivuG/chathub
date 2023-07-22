@@ -1,4 +1,10 @@
 package com.jhc.chathub.mapper;
 
-public class UserMapper {
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.jhc.chathub.pojo.entity.User;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface UserMapper extends BaseMapper<User> {
+
 }
