@@ -22,6 +22,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -50,12 +51,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public Response<String> login(LoginFormDTO loginForm) {
         // 1.根据账号查询用户
-        User user = query().eq("account", loginForm.getAccount()).one();
-        if (user == null) {
+        List<User> users = query().eq("account", loginForm.getAccount()).list();
+        if (users.isEmpty()) {
             return Response.fail("账号不存在, 请先注册!");
         }
 
         // 2.校验密码
+        User user = users.get(0);
         if (!PasswordEncoder.matches(user.getPassword(), loginForm.getPassword())) {
             return Response.fail("密码错误!");
         }
@@ -80,12 +82,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public Response<String> phoneLogin(PhoneLoginFormDTO phoneLoginForm) {
         // 1.根据手机号查询用户
-        User user = query().eq("phone", phoneLoginForm.getPhone()).one();
-        if (user == null) {
+        List<User> users = query().eq("phone", phoneLoginForm.getPhone()).list();
+        if (users.isEmpty()) {
             return Response.fail("该手机号未注册账号, 请先注册!");
         }
 
         // 2.校验验证码
+        User user = users.get(0);
         String rightCode = stringRedisTemplate.opsForValue().get(RedisConstant.PHONE_CODE_KEY + phoneLoginForm.getPhone());
         if (rightCode == null) {
             return Response.fail("验证码已过期, 请重新获取验证码!");
@@ -101,13 +104,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public Response<String> register(RegisterFormDTO registerForm) {
         // 1.先判断手机号和账号是否已经被注册
-        User user = query().eq("phone", registerForm.getPhone()).or().eq("account", registerForm.getAccount()).one();
-        if (user != null) {
+        List<User> users = query().eq("phone", registerForm.getPhone()).or().eq("account", registerForm.getAccount()).list();
+        if (!users.isEmpty()) {
             return Response.fail("该手机号或账号已被注册!");
         }
 
         // 2.生成user实例并插入数据库
-        user = new User();
+        User user = new User();
         String encodePassword = PasswordEncoder.encode(registerForm.getPassword());
         String nickName = SystemConstant.DEFAULT_NICK_NAME_PREFIX + RandomUtil.randomString(6);
         user.setAccount(registerForm.getAccount()).setPassword(encodePassword).setPhone(registerForm.getPhone()).setNickName(nickName);
