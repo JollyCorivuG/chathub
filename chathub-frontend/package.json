@@ -1,0 +1,26 @@
+{
+    "name": "chathub",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vue-tsc && vite build",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "pinia": "^2.1.4",
+        "sass": "^1.64.0",
+        "vant": "^4.6.2",
+        "vue": "^3.3.4",
+        "vue-router": "^4.2.4"
+    },
+    "devDependencies": {
+        "@types/node": "^20.4.2",
+        "@vitejs/plugin-vue": "^4.2.3",
+        "typescript": "^5.0.2",
+        "unplugin-vue-components": "^0.25.1",
+        "vite": "^4.4.0",
+        "vue-tsc": "^1.8.3"
+    }
+}

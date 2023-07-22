@@ -1,0 +1,23 @@
+server:
+  port: 8081
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/chathub?useSSL=false&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+  jackson:
+    default-property-inclusion: non_null
+    time-zone: GMT+8
+  data:
+    redis:
+      port: 6379
+      host: 127.0.0.1
+mybatis-plus:
+  type-aliases-package: com.jhc.chathub.pojo.entity
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
