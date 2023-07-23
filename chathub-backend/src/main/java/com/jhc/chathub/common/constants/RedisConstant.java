@@ -8,4 +8,11 @@ public class RedisConstant {
     // 手机验证码保存1min
     public static final String PHONE_CODE_KEY = "phone:code:";
     public static final Integer PHONE_CODE_KEY_TTL = 1;
+
+    // 记录在线用户
+    public static final String ID_TO_TOKEN = "token:id:";
+    public static final String ONLINE_USER_KEY = "online:user";
+
+    // 记录用户的好友
+    public static final String USER_FRIEND_KEY = "user:friend:";
 }

@@ -17,11 +17,16 @@ class ChathubApplicationTests {
 	void testInsertUser() {
 		User user = new User();
 		// 填充user所有属性
-		user.setAccount("hujunhao");
-		user.setPassword("123");
+		user.setAccount("hug");
 		user.setPhone("123456789");
 		user.setNickName("虎哥");
 		userMapper.insert(user);
+	}
+
+	@Test
+	void testQueryUser() {
+		User user = userMapper.selectById(6);
+		System.out.println(user);
 	}
 
 }

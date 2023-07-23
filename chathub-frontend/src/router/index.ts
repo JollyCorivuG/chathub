@@ -11,6 +11,14 @@ export default createRouter({
         {
             path: '/login',
             component: () => import('@/views/login/index.vue')
+        },
+        {
+            path: '/register',
+            component: () => import('@/views/register/index.vue')
+        },
+        {
+            path: '/home',
+            component: () => import('@/views/home/index.vue')
         }
     ],
     //滚动行为:控制滚动条的位置

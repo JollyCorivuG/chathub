@@ -1,9 +1,9 @@
 package com.jhc.chathub.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jhc.chathub.common.constants.RedisConstant;
 import com.jhc.chathub.common.constants.SystemConstant;
@@ -14,6 +14,7 @@ import com.jhc.chathub.pojo.dto.PhoneLoginFormDTO;
 import com.jhc.chathub.pojo.dto.RegisterFormDTO;
 import com.jhc.chathub.pojo.dto.UserDTO;
 import com.jhc.chathub.pojo.entity.User;
+import com.jhc.chathub.pojo.vo.UserVO;
 import com.jhc.chathub.service.IUserService;
 import com.jhc.chathub.utils.PasswordEncoder;
 import jakarta.annotation.Resource;
@@ -21,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -39,12 +39,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         // 2.将user转换为userDTO存储到redis中, 并设置过期时间
         UserDTO userDTO = BeanUtil.copyProperties(user, UserDTO.class);
-        Map<String, Object> userMap = BeanUtil.beanToMap(userDTO, new HashMap<>(),
-                CopyOptions.create().ignoreNullValue().setFieldValueEditor((field, value) -> value.toString()));
+        Map<String, Object> userMap = BeanUtil.beanToMap(userDTO, false, true);
+        userMap.forEach((key, value) -> userMap.put(key, String.valueOf(value)));
         stringRedisTemplate.opsForHash().putAll(userTokenKey, userMap);
         stringRedisTemplate.expire(userTokenKey, RedisConstant.USER_TOKEN_KEY_TTL, TimeUnit.MINUTES);
 
-        // 3.返回token
+        // 3.记录在线用户
+        stringRedisTemplate.opsForValue().set(RedisConstant.ID_TO_TOKEN + user.getId(), token);
+        stringRedisTemplate.opsForSet().add(RedisConstant.ONLINE_USER_KEY, token);
+
+        // 4.返回token
         return Response.success(token);
     }
 
@@ -118,5 +122,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         // 3.颁发token并返回数据
         return releaseToken(user);
+    }
+
+    @Override
+    public Response<UserVO> getUserInfo(Long selfId, Long userId) {
+        // 1.查询用户信息
+        User user = getById(userId);
+        if (user == null) {
+            return Response.fail("所要查询用户不存在!");
+        }
+
+        // 2.判断用户是否在线以及是否是自己好友
+        String token = stringRedisTemplate.opsForValue().get(RedisConstant.ID_TO_TOKEN + userId);
+        Boolean isOnline = !StrUtil.isBlank(token) &&
+                Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(RedisConstant.ONLINE_USER_KEY, userId.toString()));
+        Boolean isFriend = selfId.equals(userId) ||
+                Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(RedisConstant.USER_FRIEND_KEY + selfId, userId.toString()));
+
+        // 3.将用户信息转换为UserVO返回
+        UserVO userVO = BeanUtil.copyProperties(user, UserVO.class);
+        userVO.setIsOnline(isOnline).setIsFriend(isFriend);
+
+        // 4.返回数据
+        return Response.success(userVO);
     }
 }

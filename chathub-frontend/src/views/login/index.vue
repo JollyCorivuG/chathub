@@ -11,6 +11,7 @@
                 <van-form>
                     <van-cell-group inset>
                         <van-field
+                            type="number"
                             label="账号"
                             placeholder="请输入账号"
                             v-model="loginForm.account"
@@ -60,7 +61,7 @@
                 </div>
                 <div class="login-button">
                     <van-button type="primary" @click="doLogin">登录</van-button>
-                    <van-button @click="doLogin" style="background-color: #fffef9;border: #fffef9">注册</van-button>
+                    <van-button @click="goRegisterPage" style="background-color: #fffef9;border: #fffef9">注册</van-button>
                 </div>
             </div>
         </div>
@@ -73,6 +74,7 @@ import {CommonResponse, LoginByPhoneParams, LoginParams} from '@/api/user/type'
 import {showNotify} from 'vant'
 import useUserStore from '@/pinia/modules/user'
 import {reqPhoneCode} from '@/api/user'
+import {useRouter} from "vue-router";
 
 // 账号密码登录表单
 const loginForm = ref<LoginParams>({
@@ -146,6 +148,7 @@ const getCode = () => {
 }
 
 // 登录业务 (账号密码登录)
+const router = useRouter()
 const userStore = useUserStore()
 const doLogin = async () => {
     if (loginType.value == 0) {
@@ -155,7 +158,7 @@ const doLogin = async () => {
         }
         const resp: CommonResponse = await userStore.login(loginForm.value)
         if (resp.statusCode == 0) {
-            // TODO 登录成功的逻辑
+            await router.push('/home')
         } else {
             showNotify({type: 'danger', message: resp.statusMsg})
         }
@@ -166,11 +169,16 @@ const doLogin = async () => {
         }
         const resp: CommonResponse = await userStore.loginByPhone(phoneLoginForm.value)
         if (resp.statusCode == 0) {
-            // TODO 登录成功的逻辑
+            await router.push('/home')
         } else {
             showNotify({type: 'danger', message: resp.statusMsg})
         }
     }
+}
+
+// 点击注册按钮, 进入注册页面
+const goRegisterPage = () => {
+    router.push('/register')
 }
 
 </script>

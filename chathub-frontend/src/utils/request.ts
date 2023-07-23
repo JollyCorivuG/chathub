@@ -2,6 +2,7 @@
 import axios from 'axios'
 import { showNotify } from 'vant'
 import router from '@/router'
+import useUserStore from "@/pinia/modules/user";
 
 // 创建一个axios实例: 可以设置基础路径, 超时时间等
 const request = axios.create({
@@ -12,6 +13,10 @@ const request = axios.create({
 // 请求拦截器
 request.interceptors.request.use((config) => {
     // config: 请求拦截器回调注入的对象(配置对象), 配置对象有headers属性
+    const userStore = useUserStore()
+    if (userStore.token) {
+        config.headers.token = userStore.token
+    }
     return config
 })
 
@@ -46,7 +51,7 @@ request.interceptors.response.use((response) => {
             })
             // 直接返回登录页面, 清除localStorage中数据
             localStorage.clear()
-            router.push({path: '/home'}).then(r => r)
+            router.push({path: '/login'}).then(r => r)
             break;
     }
     return Promise.reject(new Error(error.message))

@@ -16,7 +16,38 @@ export interface LoginByPhoneParams {
     code: string
 }
 
+// 注册请求参数
+export interface RegisterParams {
+    phone: string,
+    account: string,
+    password: string
+}
+
 // 登录响应信息
 export interface LoginResponse extends CommonResponse {
     data: string
+}
+
+// 注册响应信息
+export interface RegisterResponse extends CommonResponse {
+    data: string
+}
+
+// 用户信息
+export interface UserInfo {
+    id: number,
+    phone: string,
+    account: string,
+    nickName: string,
+    avatarUrl: string,
+    level: number,
+    friendCount: number,
+    groupCount: number,
+    isOnline: boolean,
+    isFriend: boolean
+}
+
+// 获取用户信息响应信息
+export interface GetUserInfoResponse extends CommonResponse {
+    data: UserInfo
 }
