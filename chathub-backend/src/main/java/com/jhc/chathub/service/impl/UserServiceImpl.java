@@ -4,6 +4,8 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jhc.chathub.common.constants.RedisConstant;
 import com.jhc.chathub.common.constants.SystemConstant;
@@ -17,6 +19,8 @@ import com.jhc.chathub.pojo.entity.User;
 import com.jhc.chathub.pojo.vo.UserVO;
 import com.jhc.chathub.service.IUserService;
 import com.jhc.chathub.utils.PasswordEncoder;
+import com.jhc.chathub.utils.RegexUtils;
+import com.jhc.chathub.utils.UserHolder;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -24,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -124,6 +129,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return releaseToken(user);
     }
 
+    private UserVO convertUserToUserVO(Long selfId, User user) {
+        // 1..判断用户是否在线以及是否是自己好友
+        Long userId = user.getId();
+        String token = stringRedisTemplate.opsForValue().get(RedisConstant.ID_TO_TOKEN + userId);
+        Boolean isOnline = !StrUtil.isBlank(token) &&
+                Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(RedisConstant.ONLINE_USER_KEY, token));
+        Boolean isFriend = selfId.equals(userId) ||
+                Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(RedisConstant.USER_FRIEND_KEY + selfId, userId.toString()));
+
+        // 2..将用户信息转换为UserVO
+        UserVO userVO = BeanUtil.copyProperties(user, UserVO.class);
+        return userVO.setIsOnline(isOnline).setIsFriend(isFriend);
+    }
+
     @Override
     public Response<UserVO> getUserInfo(Long selfId, Long userId) {
         // 1.查询用户信息
@@ -132,18 +151,48 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             return Response.fail("所要查询用户不存在!");
         }
 
-        // 2.判断用户是否在线以及是否是自己好友
-        String token = stringRedisTemplate.opsForValue().get(RedisConstant.ID_TO_TOKEN + userId);
-        Boolean isOnline = !StrUtil.isBlank(token) &&
-                Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(RedisConstant.ONLINE_USER_KEY, userId.toString()));
-        Boolean isFriend = selfId.equals(userId) ||
-                Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(RedisConstant.USER_FRIEND_KEY + selfId, userId.toString()));
+        // 2.将user转换为userVO返回
+        return Response.success(convertUserToUserVO(selfId, user));
+    }
 
-        // 3.将用户信息转换为UserVO返回
-        UserVO userVO = BeanUtil.copyProperties(user, UserVO.class);
-        userVO.setIsOnline(isOnline).setIsFriend(isFriend);
+    private List<UserVO> queryWithCondition(String vagueNickName, boolean isPhone, boolean isAccount) {
+        // 1.创建条件构造器
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
 
-        // 4.返回数据
-        return Response.success(userVO);
+        // 2.模糊昵称是一定的, 然后根据isPhone和isAccount判断可能是根据什么查询
+        queryWrapper.like("nick_name", vagueNickName);
+        if (isPhone) {
+            queryWrapper.or().eq("phone", vagueNickName);
+        }
+        if (isAccount) {
+            queryWrapper.or().eq("account", vagueNickName);
+        }
+
+        // 3.查询用户
+        Long selfId = UserHolder.getUser().getId();
+        List<User> users = list(queryWrapper);
+        List<UserVO> userVOs = users.stream().map(user -> {
+            if (!Objects.equals(user.getId(), selfId)) {
+                return convertUserToUserVO(selfId, user);
+            }
+            return null;
+        }).toList();
+
+        // 4.插入到redis缓存中
+        String key = RedisConstant.CACHE_QUERY_USER_KET + vagueNickName;
+        stringRedisTemplate.opsForValue().set(key, JSONUtil.toJsonStr(userVOs), RedisConstant.CACHE_QUERY_USER_KEY_TTL, TimeUnit.MINUTES);
+
+        // 5.返回结果
+        return userVOs;
+    }
+
+    @Override
+    public Response<List<UserVO>> queryByKeyword(String keyword) {
+        // 1.先校验keyword, 判断可能是根据什么查询
+        boolean isPhone = RegexUtils.isPhoneInvalid(keyword);
+        boolean isAccount = RegexUtils.isAccountInvalid(keyword);
+
+        // 2.返回结果
+        return Response.success(queryWithCondition(keyword, isPhone, isAccount));
     }
 }

@@ -1,5 +1,6 @@
 package com.jhc.chathub.controller;
 
+import cn.hutool.json.JSONUtil;
 import com.jhc.chathub.common.constants.RedisConstant;
 import com.jhc.chathub.common.resp.Response;
 import com.jhc.chathub.pojo.dto.LoginFormDTO;
@@ -11,12 +12,16 @@ import com.jhc.chathub.utils.UserHolder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
 @Tag(name = "用户相关接口")
+@Slf4j
 public class UserController {
     @Resource
     private IUserService userService;
@@ -72,5 +77,19 @@ public class UserController {
         }
         stringRedisTemplate.delete(RedisConstant.ID_TO_TOKEN + selfId);
         return Response.success(null);
+    }
+
+    @GetMapping("/query/{keyword}")
+    @Operation(summary = "根据关键字查询用户")
+    public Response<List<UserVO>> queryByKeyword(@PathVariable("keyword") String keyword) {
+        // 先从缓存中查询
+        String cacheData = stringRedisTemplate.opsForValue().get(RedisConstant.CACHE_QUERY_USER_KET + keyword);
+        if (cacheData != null) {
+            log.info("从缓存中查询用户: {}", cacheData);
+            return Response.success(JSONUtil.toList(JSONUtil.parseArray(cacheData), UserVO.class));
+        }
+
+        // 如果缓存中没有，再从数据库中查询
+        return userService.queryByKeyword(keyword);
     }
 }

@@ -4,8 +4,8 @@
             <van-icon name="arrow-left" size="1.8em" color="#fff" @click="goBack"></van-icon>
         </div>
         <div class="middle">
-            <div class="search-person" :class="{active: searchType == 0}" @click="searchPerson">找人</div>
-            <div class="search-group" :class="{active: searchType == 1}" @click="searchGroup">找群</div>
+            <div class="search-person" :class="{active: searchType == 0}" @click="searchPerson">加人</div>
+            <div class="search-group" :class="{active: searchType == 1}" @click="searchGroup">加群</div>
         </div>
         <div class="right">
             <van-icon name="search" size="1.8em" color="#fff"></van-icon>
@@ -66,7 +66,7 @@ const searchGroup = () => {
     .middle {
         display: flex;
         align-items: center;
-        font-size: 19px;
+        font-size: 17px;
         color: white;
         .search-person {
             padding: 8px 8px 8px 15px;

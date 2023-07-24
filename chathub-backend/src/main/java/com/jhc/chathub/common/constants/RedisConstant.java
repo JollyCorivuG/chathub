@@ -15,4 +15,8 @@ public class RedisConstant {
 
     // 记录用户的好友
     public static final String USER_FRIEND_KEY = "user:friend:";
+
+    // 缓存查询用户
+    public static final String CACHE_QUERY_USER_KET = "cache:users:";
+    public static final Integer CACHE_QUERY_USER_KEY_TTL = 5;
 }

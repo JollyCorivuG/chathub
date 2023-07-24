@@ -111,6 +111,7 @@ const phoneLoginForm = ref<LoginByPhoneParams>({
     code: ''
 })
 const checkPhone = (val: string) => {
+    // 手机号正则表达式
     const reg = /^1[3-9]\d{9}$/
     return reg.test(val)
 }

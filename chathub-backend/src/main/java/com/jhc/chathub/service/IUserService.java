@@ -6,6 +6,8 @@ import com.jhc.chathub.pojo.dto.PhoneLoginFormDTO;
 import com.jhc.chathub.pojo.dto.RegisterFormDTO;
 import com.jhc.chathub.pojo.vo.UserVO;
 
+import java.util.List;
+
 public interface IUserService {
     Response<String> login(LoginFormDTO loginForm);
 
@@ -16,4 +18,6 @@ public interface IUserService {
     Response<Void> phoneCode(String phone);
 
     Response<UserVO> getUserInfo(Long selfId, Long userId);
+
+    Response<List<UserVO>> queryByKeyword(String keyword);
 }
