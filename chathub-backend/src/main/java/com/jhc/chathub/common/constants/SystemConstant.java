@@ -7,4 +7,7 @@ public class SystemConstant {
 
     // 默认用户前缀名
     public static final String DEFAULT_NICK_NAME_PREFIX = "user_";
+
+    // 默认用户头像
+    public static final String DEFAULT_USER_AVATAR_URL = "http://localhost:8081/upload/default_user_avatar.jpg";
 }

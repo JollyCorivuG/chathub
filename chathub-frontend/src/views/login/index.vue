@@ -74,12 +74,13 @@ import {CommonResponse, LoginByPhoneParams, LoginParams} from '@/api/user/type'
 import {showNotify} from 'vant'
 import useUserStore from '@/pinia/modules/user'
 import {reqPhoneCode} from '@/api/user'
-import {useRouter} from "vue-router";
+import {useRouter, useRoute} from "vue-router";
 
 // 账号密码登录表单
+const route = useRoute()
 const loginForm = ref<LoginParams>({
-    account: '1547676099',
-    password: 'haocheng123'
+    account: route.query.account as string | '',
+    password: ''
 })
 const checkAccount = (val: string) => {
     const reg = /^\d{10}$/

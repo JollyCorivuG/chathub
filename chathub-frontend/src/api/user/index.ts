@@ -20,6 +20,8 @@ enum UserApi {
     registerUrl = '/users/register',
     // 登录后获取自己的信息
     getSelfInfoUrl = '/users/info/me',
+    // 登出
+    logoutUrl = '/users/logout'
 }
 
 // 登录
@@ -36,3 +38,6 @@ export const reqRegister = (registerForm: RegisterParams) => request.post<any, R
 
 // 登录后获取自己的信息
 export const reqGetSelfInfo = () => request.get<any, GetUserInfoResponse>(UserApi.getSelfInfoUrl)
+
+// 登出
+export const reqLogout = () => request.get<any, CommonResponse>(UserApi.logoutUrl)

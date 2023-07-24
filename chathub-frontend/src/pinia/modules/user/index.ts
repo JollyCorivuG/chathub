@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import {reqGetSelfInfo, reqLogin, reqLoginByPhone, reqRegister} from '@/api/user'
+import {reqGetSelfInfo, reqLogin, reqLoginByPhone, reqLogout, reqRegister} from '@/api/user'
 import {
     CommonResponse, GetUserInfoResponse,
     LoginByPhoneParams,
@@ -52,6 +52,11 @@ const useUserStore = defineStore('User', {
             if (resp.statusCode == 0) {
                 await this.afterLogin(resp.data)
             }
+            return resp as CommonResponse
+        },
+        async logout(): Promise<CommonResponse>{
+            const resp: CommonResponse = await reqLogout()
+            localStorage.clear()
             return resp as CommonResponse
         }
     }

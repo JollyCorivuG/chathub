@@ -19,7 +19,22 @@ export default createRouter({
         {
             path: '/home',
             component: () => import('@/views/home/index.vue')
+        },
+        {
+            path: '/add',
+            component: () => import('@/views/add/index.vue'),
+            children: [
+                {
+                    path: 'friend',
+                    component: () => import('@/views/add/add_friend/index.vue'),
+                },
+                {
+                    path: 'group',
+                    component: () => import('@/views/add/add_group/index.vue'),
+                }
+            ]
         }
+
     ],
     //滚动行为:控制滚动条的位置
     scrollBehavior() {

@@ -117,7 +117,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         User user = new User();
         String encodePassword = PasswordEncoder.encode(registerForm.getPassword());
         String nickName = SystemConstant.DEFAULT_NICK_NAME_PREFIX + RandomUtil.randomString(6);
-        user.setAccount(registerForm.getAccount()).setPassword(encodePassword).setPhone(registerForm.getPhone()).setNickName(nickName);
+        user.setAccount(registerForm.getAccount()).setPassword(encodePassword).setPhone(registerForm.getPhone()).setNickName(nickName).setAvatarUrl(SystemConstant.DEFAULT_USER_AVATAR_URL);
         save(user);
 
         // 3.颁发token并返回数据

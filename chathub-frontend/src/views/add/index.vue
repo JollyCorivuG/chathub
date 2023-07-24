@@ -1,13 +1,11 @@
 <template>
-    <TopTab></TopTab>
+    <AddTop></AddTop>
     <div class="offset"></div>
     <router-view></router-view>
-    <BottomTabbar></BottomTabbar>
 </template>
 
 <script setup lang="ts">
-import TopTab from '@/components/top_tab/index.vue'
-import BottomTabbar from '@/components/bottom_tabbar/index.vue'
+import AddTop from '@/components/add_top/index.vue'
 </script>
 
 <style scoped lang="scss">
