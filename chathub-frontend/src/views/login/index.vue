@@ -160,7 +160,7 @@ const doLogin = async () => {
         }
         const resp: CommonResponse = await userStore.login(loginForm.value)
         if (resp.statusCode == 0) {
-            await router.push('/home')
+            await router.push('/home/message')
         } else {
             showNotify({type: 'danger', message: resp.statusMsg})
         }
@@ -171,7 +171,7 @@ const doLogin = async () => {
         }
         const resp: CommonResponse = await userStore.loginByPhone(phoneLoginForm.value)
         if (resp.statusCode == 0) {
-            await router.push('/home')
+            await router.push('/home/message')
         } else {
             showNotify({type: 'danger', message: resp.statusMsg})
         }

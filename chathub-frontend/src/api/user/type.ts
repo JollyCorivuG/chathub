@@ -51,3 +51,9 @@ export interface UserInfo {
 export interface GetUserInfoResponse extends CommonResponse {
     data: UserInfo
 }
+
+// 根据关键字查询用户响应信息
+export type UserList = UserInfo[]
+export interface SearchUserResponse extends CommonResponse {
+    data: UserList
+}

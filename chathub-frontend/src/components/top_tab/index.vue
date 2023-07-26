@@ -70,6 +70,7 @@ const doLogout = async () => {
 .top_tab {
     width: 100%;
     position: fixed;
+    z-index: 999;
     // 实现#00D2FC到#27B7FC的渐变色
     background: linear-gradient(90deg, #00D2FC 0%, #27B7FC 100%);
     height: 8%;

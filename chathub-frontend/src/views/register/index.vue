@@ -97,7 +97,7 @@ const doRegister = async () => {
     }
     const resp: CommonResponse = await userStore.register(registerForm.value)
     if (resp.statusCode == 0) {
-        await router.push('/home')
+        await router.push('/home/message')
     } else {
         showNotify({type: 'danger',message: resp.statusMsg})
     }

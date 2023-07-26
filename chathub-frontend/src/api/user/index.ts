@@ -7,7 +7,7 @@ import type {
     RegisterParams,
     RegisterResponse
 } from './type'
-import {GetUserInfoResponse} from "./type";
+import {GetUserInfoResponse, SearchUserResponse} from "./type";
 
 enum UserApi {
     // 登录
@@ -21,7 +21,9 @@ enum UserApi {
     // 登录后获取自己的信息
     getSelfInfoUrl = '/users/info/me',
     // 登出
-    logoutUrl = '/users/logout'
+    logoutUrl = '/users/logout',
+    // 根据关键字查询用户
+    searchUserUrl = '/users/query',
 }
 
 // 登录
@@ -41,3 +43,6 @@ export const reqGetSelfInfo = () => request.get<any, GetUserInfoResponse>(UserAp
 
 // 登出
 export const reqLogout = () => request.get<any, CommonResponse>(UserApi.logoutUrl)
+
+// 根据关键字查询用户
+export const reqSearchUser = (keyword: string, currentPage: number) => request.get<any, SearchUserResponse>(UserApi.searchUserUrl + `/${keyword}` + '?page=' + currentPage)

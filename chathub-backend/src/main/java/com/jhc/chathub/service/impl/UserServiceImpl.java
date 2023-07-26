@@ -6,6 +6,7 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jhc.chathub.common.constants.RedisConstant;
 import com.jhc.chathub.common.constants.SystemConstant;
@@ -26,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -155,7 +157,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return Response.success(convertUserToUserVO(selfId, user));
     }
 
-    private List<UserVO> queryWithCondition(String vagueNickName, boolean isPhone, boolean isAccount) {
+    private List<UserVO> queryWithCondition(String vagueNickName, boolean isPhone, boolean isAccount, Integer currentPage) {
         // 1.创建条件构造器
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
 
@@ -168,18 +170,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             queryWrapper.or().eq("account", vagueNickName);
         }
 
-        // 3.查询用户
+        // 3.分页查询
+        queryWrapper.orderByDesc("id");
+        Page<User> userPage = new Page<>(currentPage, SystemConstant.DEFAULT_PAGE_SIZE);
+        userPage.setSearchCount(false); // 关闭查询总记录数
+
+        // 4.查询用户
+        Page<User> userRecords = page(userPage, queryWrapper);
+        List<User> users = userRecords.getRecords();
         Long selfId = UserHolder.getUser().getId();
-        List<User> users = list(queryWrapper);
-        List<UserVO> userVOs = users.stream().map(user -> {
+        List<UserVO> userVOs = new ArrayList<>(users.stream().map(user -> {
             if (!Objects.equals(user.getId(), selfId)) {
                 return convertUserToUserVO(selfId, user);
             }
             return null;
-        }).toList();
+        }).toList());
+        userVOs.removeIf(Objects::isNull);
 
         // 4.插入到redis缓存中
-        String key = RedisConstant.CACHE_QUERY_USER_KET + vagueNickName;
+        String key = RedisConstant.CACHE_QUERY_USER_KET + vagueNickName + ":" + currentPage;
         stringRedisTemplate.opsForValue().set(key, JSONUtil.toJsonStr(userVOs), RedisConstant.CACHE_QUERY_USER_KEY_TTL, TimeUnit.MINUTES);
 
         // 5.返回结果
@@ -187,12 +196,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public Response<List<UserVO>> queryByKeyword(String keyword) {
+    public Response<List<UserVO>> queryByKeyword(String keyword, Integer page) {
         // 1.先校验keyword, 判断可能是根据什么查询
-        boolean isPhone = RegexUtils.isPhoneInvalid(keyword);
-        boolean isAccount = RegexUtils.isAccountInvalid(keyword);
+        boolean isPhone = RegexUtils.isPhoneValid(keyword);
+        boolean isAccount = RegexUtils.isAccountValid(keyword);
 
         // 2.返回结果
-        return Response.success(queryWithCondition(keyword, isPhone, isAccount));
+        return Response.success(queryWithCondition(keyword, isPhone, isAccount, page));
     }
 }

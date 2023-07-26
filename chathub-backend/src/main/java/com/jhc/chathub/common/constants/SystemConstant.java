@@ -10,4 +10,18 @@ public class SystemConstant {
 
     // 默认用户头像
     public static final String DEFAULT_USER_AVATAR_URL = "http://localhost:8081/upload/default_user_avatar.jpg";
+
+    // 查询用户的默认分页参数
+    public static final Integer DEFAULT_PAGE_SIZE = 20;
+
+    // 好友通知的一些常量
+    public static final Integer NOTICE_TYPE_ADD_OTHER = 0; // 申请添加好友
+    public static final Integer NOTICE_TYPE_OTHER_ADD_ME = 1; // 对方申请添加好友
+    public static final Integer NOTICE_STATUS_WAIT = 0; // 待处理
+    public static final Integer NOTICE_STATUS_PASS = 1; // 已通过
+    public static final Integer NOTICE_STATUS_NOT_PASS = 2; // 未通过
+    public static final Integer NOTICE_STATUS_REFUSE = 3; // 已拒绝
+    public static final Integer NOTICE_STATUS_ACCEPT = 4; // 已接受
+    public static final Integer NOTICE_STATUS_PENDING = 5; // 等待处理
+
 }

@@ -18,5 +18,5 @@ public class RedisConstant {
 
     // 缓存查询用户
     public static final String CACHE_QUERY_USER_KET = "cache:users:";
-    public static final Integer CACHE_QUERY_USER_KEY_TTL = 5;
+    public static final Integer CACHE_QUERY_USER_KEY_TTL = 2;
 }

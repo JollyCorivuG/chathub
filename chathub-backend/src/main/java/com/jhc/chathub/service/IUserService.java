@@ -19,5 +19,5 @@ public interface IUserService {
 
     Response<UserVO> getUserInfo(Long selfId, Long userId);
 
-    Response<List<UserVO>> queryByKeyword(String keyword);
+    Response<List<UserVO>> queryByKeyword(String keyword, Integer page);
 }

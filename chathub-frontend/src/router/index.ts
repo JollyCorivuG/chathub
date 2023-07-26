@@ -18,7 +18,25 @@ export default createRouter({
         },
         {
             path: '/home',
-            component: () => import('@/views/home/index.vue')
+            component: () => import('@/views/home/index.vue'),
+            children: [
+                {
+                    path: 'message',
+                    component: () => import('@/views/home/message/index.vue'),
+                },
+                {
+                    path: 'contact',
+                    component: () => import('@/views/home/contact/index.vue'),
+                },
+                {
+                    path: 'notice',
+                    component: () => import('@/views/home/notice/index.vue'),
+                },
+                {
+                    path: 'trend',
+                    component: () => import('@/views/home/trend/index.vue'),
+                }
+            ]
         },
         {
             path: '/add',

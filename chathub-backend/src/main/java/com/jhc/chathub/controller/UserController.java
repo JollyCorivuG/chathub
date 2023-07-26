@@ -81,15 +81,15 @@ public class UserController {
 
     @GetMapping("/query/{keyword}")
     @Operation(summary = "根据关键字查询用户")
-    public Response<List<UserVO>> queryByKeyword(@PathVariable("keyword") String keyword) {
+    public Response<List<UserVO>> queryByKeyword(@PathVariable("keyword") String keyword, @RequestParam(value = "page", defaultValue = "1") Integer page) {
         // 先从缓存中查询
-        String cacheData = stringRedisTemplate.opsForValue().get(RedisConstant.CACHE_QUERY_USER_KET + keyword);
+        String cacheData = stringRedisTemplate.opsForValue().get(RedisConstant.CACHE_QUERY_USER_KET + keyword + ":" + page.toString());
         if (cacheData != null) {
             log.info("从缓存中查询用户: {}", cacheData);
             return Response.success(JSONUtil.toList(JSONUtil.parseArray(cacheData), UserVO.class));
         }
 
         // 如果缓存中没有，再从数据库中查询
-        return userService.queryByKeyword(keyword);
+        return userService.queryByKeyword(keyword, page);
     }
 }
