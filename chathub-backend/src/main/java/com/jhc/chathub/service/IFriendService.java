@@ -8,4 +8,6 @@ public interface IFriendService {
     Response<Void> friendApplication(FriendApplication friendApplication);
 
     Response<Void> acceptFriendApplication(FriendApplicationReply friendApplicationReply);
+
+    Response<Void> deleteFriend(Long id);
 }

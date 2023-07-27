@@ -134,4 +134,25 @@ public class FriendServiceImpl extends ServiceImpl<FriendRelationMapper, FriendR
         }
         return Response.success(null);
     }
+
+    @Override
+    public Response<Void> deleteFriend(Long id) {
+        // 1.先删除redis中的好友关系
+        Long selfId = UserHolder.getUser().getId();
+        stringRedisTemplate.opsForSet().remove(RedisConstant.USER_FRIEND_KEY + selfId, id.toString());
+        stringRedisTemplate.opsForSet().remove(RedisConstant.USER_FRIEND_KEY + id, selfId.toString());
+
+        // 2.再删除数据库中的好友关系
+        QueryWrapper<FriendRelation> queryWrapper = new QueryWrapper<>();
+        queryWrapper
+                .eq("user_id1", selfId)
+                .eq("user_id2", id)
+                .or()
+                .eq("user_id1", id)
+                .eq("user_id2", selfId);
+        remove(queryWrapper);
+
+        // 3.返回响应
+        return Response.success(null);
+    }
 }

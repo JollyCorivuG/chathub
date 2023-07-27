@@ -131,8 +131,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return releaseToken(user);
     }
 
-    private UserVO convertUserToUserVO(Long selfId, User user) {
-        // 1..判断用户是否在线以及是否是自己好友
+    @Override
+    public UserVO convertUserToUserVO(Long selfId, User user) {
+        // 1.判断用户是否在线以及是否是自己好友
         Long userId = user.getId();
         String token = stringRedisTemplate.opsForValue().get(RedisConstant.ID_TO_TOKEN + userId);
         Boolean isOnline = !StrUtil.isBlank(token) &&
@@ -140,7 +141,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         Boolean isFriend = selfId.equals(userId) ||
                 Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(RedisConstant.USER_FRIEND_KEY + selfId, userId.toString()));
 
-        // 2..将用户信息转换为UserVO
+        // 2.将用户信息转换为UserVO
         UserVO userVO = BeanUtil.copyProperties(user, UserVO.class);
         return userVO.setIsOnline(isOnline).setIsFriend(isFriend);
     }
