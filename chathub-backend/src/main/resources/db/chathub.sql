@@ -37,4 +37,19 @@ CREATE TABLE `tb_friend_notice`  (
      `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
      PRIMARY KEY (`id`) USING BTREE,
      INDEX `idx_connect_user_id`(`connect_user_id`) USING BTREE
+);
+
+DROP TABLE IF EXISTS `tb_message`;
+CREATE TABLE `tb_message`  (
+       `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+       `room_id` bigint(20) NOT NULL COMMENT '会话id',
+       `from_user_id` bigint(20) NOT NULL COMMENT '发送者id',
+       `content` varchar(1024) NULL COMMENT '消息内容',
+       `msg_type` tinyint NOT NULL COMMENT '消息类型 0-正常文本 1-图片消息 2-文件消息',
+       `extra` json NULL COMMENT '扩展信息',
+       `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+       `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+       PRIMARY KEY (`id`) USING BTREE,
+       INDEX `idx_room_id`(`room_id`) USING BTREE,
+       INDEX `idx_from_uid`(`from_user_id`) USING BTREE
 )

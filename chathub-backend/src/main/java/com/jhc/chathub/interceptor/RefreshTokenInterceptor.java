@@ -3,7 +3,7 @@ package com.jhc.chathub.interceptor;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.jhc.chathub.common.constants.RedisConstant;
-import com.jhc.chathub.pojo.dto.UserDTO;
+import com.jhc.chathub.pojo.dto.user.UserDTO;
 import com.jhc.chathub.utils.UserHolder;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

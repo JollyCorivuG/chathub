@@ -2,9 +2,9 @@ package com.jhc.chathub.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.jhc.chathub.common.resp.Response;
-import com.jhc.chathub.pojo.dto.LoginFormDTO;
-import com.jhc.chathub.pojo.dto.PhoneLoginFormDTO;
-import com.jhc.chathub.pojo.dto.RegisterFormDTO;
+import com.jhc.chathub.pojo.dto.user.LoginFormDTO;
+import com.jhc.chathub.pojo.dto.user.PhoneLoginFormDTO;
+import com.jhc.chathub.pojo.dto.user.RegisterFormDTO;
 import com.jhc.chathub.pojo.entity.User;
 import com.jhc.chathub.pojo.vo.UserVO;
 

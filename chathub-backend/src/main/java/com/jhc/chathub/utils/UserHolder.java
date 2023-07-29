@@ -1,6 +1,6 @@
 package com.jhc.chathub.utils;
 
-import com.jhc.chathub.pojo.dto.UserDTO;
+import com.jhc.chathub.pojo.dto.user.UserDTO;
 
 public class UserHolder {
     private static final ThreadLocal<UserDTO> tl = new ThreadLocal<>();

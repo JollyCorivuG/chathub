@@ -1,4 +1,4 @@
-package com.jhc.chathub.pojo.dto;
+package com.jhc.chathub.pojo.dto.friend;
 
 
 import lombok.Data;

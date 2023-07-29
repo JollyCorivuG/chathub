@@ -1,4 +1,4 @@
-package com.jhc.chathub.pojo.dto;
+package com.jhc.chathub.pojo.dto.user;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
