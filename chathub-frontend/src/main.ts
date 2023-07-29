@@ -7,6 +7,7 @@ import { Notify } from 'vant'
 import 'vant/es/notify/style'
 import { Icon } from 'vant';
 import { Popover } from 'vant'
+import '@/permission.ts'
 
 const app = createApp(App)
 app.use(router)

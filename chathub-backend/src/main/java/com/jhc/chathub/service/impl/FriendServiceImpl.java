@@ -7,13 +7,13 @@ import com.jhc.chathub.common.constants.SystemConstant;
 import com.jhc.chathub.common.resp.Response;
 import com.jhc.chathub.mapper.FriendNoticeMapper;
 import com.jhc.chathub.mapper.FriendRelationMapper;
-import com.jhc.chathub.mapper.UserMapper;
 import com.jhc.chathub.pojo.dto.FriendApplication;
 import com.jhc.chathub.pojo.dto.FriendApplicationReply;
 import com.jhc.chathub.pojo.entity.FriendNotice;
 import com.jhc.chathub.pojo.entity.FriendRelation;
 import com.jhc.chathub.pojo.entity.User;
 import com.jhc.chathub.service.IFriendService;
+import com.jhc.chathub.service.IUserService;
 import com.jhc.chathub.utils.UserHolder;
 import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -28,24 +28,28 @@ public class FriendServiceImpl extends ServiceImpl<FriendRelationMapper, FriendR
     private StringRedisTemplate stringRedisTemplate;
 
     @Resource
-    private UserMapper userMapper;
+    private IUserService userService;
 
     @Resource
     private FriendNoticeMapper friendNoticeMapper;
+
+    private boolean isFriend(Long selfId, Long otherId) {
+        String key = RedisConstant.USER_FRIEND_KEY + selfId;
+        return Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(key, otherId.toString()));
+    }
 
     @Override
     @Transactional
     public Response<Void> friendApplication(FriendApplication friendApplication) {
         // 1.查询对方信息
-        User user = userMapper.selectById(friendApplication.getToUserId());
+        User user = userService.getById(friendApplication.getToUserId());
         if (user == null) {
             return Response.fail("所要添加的用户不存在");
         }
 
         // 2.判断是否已经是好友
         Long selfId = UserHolder.getUser().getId();
-        String key = RedisConstant.USER_FRIEND_KEY + selfId;
-        if (Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(key, friendApplication.getToUserId().toString()))) {
+        if (isFriend(selfId, friendApplication.getToUserId())) {
             return Response.fail("该用户已经是你的好友");
         }
 
@@ -106,18 +110,20 @@ public class FriendServiceImpl extends ServiceImpl<FriendRelationMapper, FriendR
             otherNotice.setStatusInfo(SystemConstant.NOTICE_STATUS_NOT_PASS);
             friendNoticeMapper.update(otherNotice, queryWrapper);
         } else {
-            // 3.1创建好友关系
+            // 3.1将好友关系存入redis
+            stringRedisTemplate.opsForSet().add(key, otherId.toString());
+            String otherKey = RedisConstant.USER_FRIEND_KEY + otherId;
+            stringRedisTemplate.opsForSet().add(otherKey, selfId.toString());
+
+            // 3.2创建好友关系
             FriendRelation friendRelation = new FriendRelation();
             friendRelation.setUserId1(selfId)
                     .setUserId2(otherId);
 
-            // 3.2将好友关系存入数据库
+            // 3.3将好友关系存入数据库, 更新双方好友数量
             save(friendRelation);
-
-            // 3.3将好友关系存入redis
-            stringRedisTemplate.opsForSet().add(key, otherId.toString());
-            String otherKey = RedisConstant.USER_FRIEND_KEY + otherId;
-            stringRedisTemplate.opsForSet().add(otherKey, selfId.toString());
+            userService.update().setSql("friend_count = friend_count + 1").eq("id", selfId).update();
+            userService.update().setSql("friend_count = friend_count + 1").eq("id", otherId).update();
 
             // 3.4修改通知状态
             // 3.4.1修改自己的通知
@@ -136,13 +142,19 @@ public class FriendServiceImpl extends ServiceImpl<FriendRelationMapper, FriendR
     }
 
     @Override
+    @Transactional
     public Response<Void> deleteFriend(Long id) {
-        // 1.先删除redis中的好友关系
+        // 1.先判断是否是好友
         Long selfId = UserHolder.getUser().getId();
+        if (!isFriend(selfId, id)) {
+            return Response.fail("该用户不是你的好友");
+        }
+
+        // 2.再删除redis中的好友关系
         stringRedisTemplate.opsForSet().remove(RedisConstant.USER_FRIEND_KEY + selfId, id.toString());
         stringRedisTemplate.opsForSet().remove(RedisConstant.USER_FRIEND_KEY + id, selfId.toString());
 
-        // 2.再删除数据库中的好友关系
+        // 3.最后删除数据库中的好友关系, 以及扣减双方好友数量
         QueryWrapper<FriendRelation> queryWrapper = new QueryWrapper<>();
         queryWrapper
                 .eq("user_id1", selfId)
@@ -151,8 +163,10 @@ public class FriendServiceImpl extends ServiceImpl<FriendRelationMapper, FriendR
                 .eq("user_id1", id)
                 .eq("user_id2", selfId);
         remove(queryWrapper);
+        userService.update().setSql("friend_count = friend_count - 1").eq("id", selfId).update();
+        userService.update().setSql("friend_count = friend_count - 1").eq("id", id).update();
 
-        // 3.返回响应
+        // 4.返回响应
         return Response.success(null);
     }
 }

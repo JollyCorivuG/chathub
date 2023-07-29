@@ -1,3 +1,3 @@
-export const convertJavaTimeToString = (jTime: string) => {
+export const convertJavaTimeToString = (jTime: string): string => {
     return jTime.replace('T', ' ')
 }
