@@ -67,7 +67,7 @@ public class NettyWebSocketServer {
                         pipeline.addLast(new HttpServerCodec());
                         pipeline.addLast(new ChunkedWriteHandler());
                         pipeline.addLast(new HttpObjectAggregator(8192));
-                        // 添加http请求头处理器 (主要用于获取token)
+                        // 添加http请求头处理器 (主要用于获取token以及roomId)
                         pipeline.addLast(new HttpHeaderHandler());
                         // 将服务器的根路径（"/"）映射为 WebSocket 协议的路径，即将 HTTP 协议升级为 WebSocket 协议
                         pipeline.addLast(new WebSocketServerProtocolHandler("/"));

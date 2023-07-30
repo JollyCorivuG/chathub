@@ -61,7 +61,7 @@
                 </div>
                 <div class="login-button">
                     <van-button type="primary" @click="doLogin">登录</van-button>
-                    <van-button @click="goRegisterPage" style="background-color: #fffef9;border: #fffef9">注册</van-button>
+                    <van-button @click="goRegisterPage" style="background-color: #e2e1e4;border: #e2e1e4">注册</van-button>
                 </div>
             </div>
         </div>
@@ -187,7 +187,10 @@ const goRegisterPage = () => {
 
 <style scoped lang="scss">
 .login-container {
-    background-color: #F7F8FA;
+    background-size: cover;
+    background: #F7F8FA url(https://gw.alipayobjects.com/zos/rmsportal/FfdJeJRQWjEeGTpqgBKj.png) no-repeat;
+    background-size: cover;
+    // 背景透明度
     height: 100%;
     display: flex;
     align-items: center;

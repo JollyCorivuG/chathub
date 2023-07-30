@@ -5,6 +5,7 @@ import com.jhc.chathub.common.resp.Response;
 import com.jhc.chathub.pojo.dto.user.LoginFormDTO;
 import com.jhc.chathub.pojo.dto.user.PhoneLoginFormDTO;
 import com.jhc.chathub.pojo.dto.user.RegisterFormDTO;
+import com.jhc.chathub.pojo.dto.user.UserDTO;
 import com.jhc.chathub.pojo.entity.User;
 import com.jhc.chathub.pojo.vo.UserVO;
 
@@ -24,4 +25,6 @@ public interface IUserService extends IService<User> {
     Response<List<UserVO>> queryByKeyword(String keyword, Integer page);
 
     UserVO convertUserToUserVO(Long selfId, User user);
+
+    UserDTO getUserByToken(String token);
 }

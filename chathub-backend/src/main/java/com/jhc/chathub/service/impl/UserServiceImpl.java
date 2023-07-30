@@ -147,6 +147,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
+    public UserDTO getUserByToken(String token) {
+        Map<Object, Object> userMap = stringRedisTemplate.opsForHash().entries(RedisConstant.USER_TOKEN_KEY + token);
+        if (userMap.isEmpty()) {
+            return null;
+        }
+        return BeanUtil.fillBeanWithMap(userMap, new UserDTO(), false);
+    }
+
+    @Override
     public Response<UserVO> getUserInfo(Long selfId, Long userId) {
         // 1.查询用户信息
         User user = getById(userId);

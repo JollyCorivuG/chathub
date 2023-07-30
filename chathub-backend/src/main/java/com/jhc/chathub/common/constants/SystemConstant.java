@@ -24,4 +24,14 @@ public class SystemConstant {
     public static final Integer NOTICE_STATUS_ACCEPT = 4; // 已接受
     public static final Integer NOTICE_STATUS_PENDING = 5; // 等待处理
 
+    // 消息类型
+    public static final Integer TEXT_MSG = 0;
+    public static final Integer IMG_MSG = 1;
+    public static final Integer FILE_MSG = 2;
+
+    // WS响应消息类型
+    public static final Integer WS_NORMAL_MSG = 0; // 普通消息
+    public static final Integer WS_HEAD_SHAKE_SUCCESS_MSG = 1; // 握手成功消息
+    public static final Integer WS_HEAD_SHAKE_FAIL_MSG = 2; // 握手失败消息
+
 }
