@@ -2,7 +2,6 @@ package com.jhc.chathub.controller;
 
 import com.jhc.chathub.common.resp.Response;
 import com.jhc.chathub.pojo.dto.message.SendMsgDTO;
-import com.jhc.chathub.pojo.entity.Message;
 import com.jhc.chathub.pojo.vo.ShowMsgVO;
 import com.jhc.chathub.service.IMessageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,8 +22,8 @@ public class MessageController {
     @PostMapping("/send")
     @Operation(summary = "发送消息")
     public Response<ShowMsgVO> sendMessage(@RequestBody SendMsgDTO sendMsg) {
-        Message message = messageService.sendMsg(sendMsg);
-        return Response.success(messageService.convertToShowMsgVO(message));
+        Long msgId = messageService.sendMsg(sendMsg);
+        return Response.success(messageService.convertToShowMsgVO(messageService.getById(msgId)));
     }
 
 }

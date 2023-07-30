@@ -6,6 +6,6 @@ import com.jhc.chathub.pojo.entity.Message;
 import com.jhc.chathub.pojo.vo.ShowMsgVO;
 
 public interface IMessageService extends IService<Message> {
-    Message sendMsg(SendMsgDTO sendMsg);
+    Long sendMsg(SendMsgDTO sendMsg);
     ShowMsgVO convertToShowMsgVO(Message message);
 }

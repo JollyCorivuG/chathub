@@ -59,7 +59,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     }
 
     @Override
-    public Message sendMsg(SendMsgDTO sendMsg) {
+    public Long sendMsg(SendMsgDTO sendMsg) {
         // 1.将sendMsg转换为Message对象并保存到数据库
         Long userId = UserHolder.getUser().getId();
         Message saveMsg = new Message();
@@ -73,6 +73,6 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         applicationEventPublisher.publishEvent(new MessageSendEvent(this, saveMsg.getId()));
 
         // 3.返回保存的消息
-        return saveMsg;
+        return saveMsg.getId();
     }
 }
