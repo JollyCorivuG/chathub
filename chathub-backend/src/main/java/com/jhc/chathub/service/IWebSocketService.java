@@ -9,6 +9,4 @@ public interface IWebSocketService {
     void remove(Channel channel);
     void sendToAssignedRoom(Long roomId, WSResponse<?> wsResponse, Long skipUid);
     void showOnlineUser();
-
-
 }
