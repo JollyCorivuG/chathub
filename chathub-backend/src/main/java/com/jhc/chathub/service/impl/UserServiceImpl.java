@@ -11,11 +11,13 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jhc.chathub.common.constants.RedisConstant;
 import com.jhc.chathub.common.constants.SystemConstant;
 import com.jhc.chathub.common.resp.Response;
+import com.jhc.chathub.mapper.FriendRelationMapper;
 import com.jhc.chathub.mapper.UserMapper;
 import com.jhc.chathub.pojo.dto.user.LoginFormDTO;
 import com.jhc.chathub.pojo.dto.user.PhoneLoginFormDTO;
 import com.jhc.chathub.pojo.dto.user.RegisterFormDTO;
 import com.jhc.chathub.pojo.dto.user.UserDTO;
+import com.jhc.chathub.pojo.entity.FriendRelation;
 import com.jhc.chathub.pojo.entity.User;
 import com.jhc.chathub.pojo.vo.UserVO;
 import com.jhc.chathub.service.IUserService;
@@ -38,6 +40,9 @@ import java.util.concurrent.TimeUnit;
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+
+    @Resource
+    private FriendRelationMapper friendRelationMapper;
 
     private Response<String> releaseToken(User user) {
         // 1.生成token
@@ -138,11 +143,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         String token = stringRedisTemplate.opsForValue().get(RedisConstant.ID_TO_TOKEN + userId);
         Boolean isOnline = !StrUtil.isBlank(token) &&
                 Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(RedisConstant.ONLINE_USER_KEY, token));
-        Boolean isFriend = selfId.equals(userId) ||
+        boolean isFriend = selfId.equals(userId) ||
                 Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(RedisConstant.USER_FRIEND_KEY + selfId, userId.toString()));
 
         // 2.将用户信息转换为UserVO
         UserVO userVO = BeanUtil.copyProperties(user, UserVO.class);
+        if (isFriend && !selfId.equals(userId)) {
+            QueryWrapper<FriendRelation> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("user_id1", selfId).eq("user_id2", userId).or()
+                    .eq("user_id1", userId).eq("user_id2", selfId);
+            userVO.setBecomeFriendTime(friendRelationMapper.selectOne(queryWrapper).getCreateTime());
+        }
         return userVO.setIsOnline(isOnline).setIsFriend(isFriend);
     }
 

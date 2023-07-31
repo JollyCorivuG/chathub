@@ -24,6 +24,8 @@ enum UserApi {
     logoutUrl = '/users/logout',
     // 根据关键字查询用户
     searchUserUrl = '/users/query',
+    // 根据用户id查询用户信息
+    getUserInfoByIdUrl = '/users/info'
 }
 
 // 登录
@@ -46,3 +48,6 @@ export const reqLogout = () => request.get<any, CommonResponse>(UserApi.logoutUr
 
 // 根据关键字查询用户
 export const reqSearchUser = (keyword: string, currentPage: number) => request.get<any, SearchUserResponse>(UserApi.searchUserUrl + `/${keyword}` + '?page=' + currentPage)
+
+// 根据用户id查询用户信息
+export const reqGetUserInfoById = (userId: number) => request.get<any, GetUserInfoResponse>(UserApi.getUserInfoByIdUrl + `/${userId}`)

@@ -143,6 +143,7 @@ const confirmAddFriend = async () => {
         showNotify({type: 'danger', message: resp.statusMsg})
     }
 }
+
 </script>
 
 <style scoped lang="scss">

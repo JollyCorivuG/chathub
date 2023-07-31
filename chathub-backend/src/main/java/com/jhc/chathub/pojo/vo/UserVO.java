@@ -3,6 +3,8 @@ package com.jhc.chathub.pojo.vo;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.time.LocalDateTime;
+
 @Data
 @Accessors(chain = true)
 public class UserVO {
@@ -16,4 +18,5 @@ public class UserVO {
     private Integer groupCount;
     private Boolean isOnline;
     private Boolean isFriend;
+    private LocalDateTime becomeFriendTime;
 }

@@ -8,6 +8,8 @@ enum FriendApi {
     friendApplyReplyUrl = '/friends/application/reply',
     // 获取好友列表
     friendListUrl = '/friends/list',
+    // 删除好友
+    deleteFriendUrl = '/friends'
 }
 
 // 发送好友申请
@@ -18,3 +20,6 @@ export const reqFriendApplyReply = (replyParams: HandleFriendRequestParams) => r
 
 // 获取好友列表
 export const reqFriendList = () => request.get<any, FriendListResponse>(FriendApi.friendListUrl)
+
+// 删除好友
+export const reqDeleteFriend = (friendId: number) => request.delete<any, CommonResponse>(FriendApi.deleteFriendUrl + `/${friendId}`)

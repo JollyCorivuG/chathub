@@ -44,7 +44,8 @@ export interface UserInfo {
     friendCount: number,
     groupCount: number,
     isOnline: boolean,
-    isFriend: boolean
+    isFriend: boolean,
+    becomeFriendTime: string,
 }
 
 // 获取用户信息响应信息

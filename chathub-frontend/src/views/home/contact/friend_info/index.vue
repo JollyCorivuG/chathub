@@ -1,5 +1,5 @@
 <template>
-    <van-cell is-link >
+    <van-cell is-link @click="goUserPage">
         <template #title>
             <div class="friend-info" :class="{'offline': !friend.isOnline}">
                 <div class="left">
@@ -25,13 +25,26 @@
 <script setup lang="ts">
 import type {UserInfo} from "@/api/user/type.ts";
 import {PropType} from "vue";
+import {useRouter} from "vue-router";
+
 // 接收父亲组件传递的数据['friend'], 类型是UserInfo
-defineProps({
+const props = defineProps({
     friend: {
         type: Object as PropType<UserInfo>,
         required: true
     }
 })
+
+// 点击单元格跳转到用户信息页
+const router = useRouter()
+const goUserPage = () => {
+    router.push({
+        path: '/user_page',
+        query: {
+            id: props.friend?.id
+        }
+    })
+}
 </script>
 
 <style scoped lang="scss">

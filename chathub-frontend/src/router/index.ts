@@ -53,6 +53,10 @@ export default createRouter({
             ]
         },
         {
+            path: '/user_page',
+            component: () => import('@/views/user_page/index.vue'),
+        },
+        {
             path: '/404',
             component: () => import('@/views/404/index.vue')
         }
