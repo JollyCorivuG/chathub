@@ -10,13 +10,11 @@ import java.time.LocalDateTime;
 
 @Data
 @Accessors(chain = true)
-@TableName("tb_friend_relation")
-public class FriendRelation {
+@TableName(value = "tb_room")
+public class Room {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
-    private Long userId1;
-    private Long userId2;
-    private Long roomId; // 两个人所属的会话id
+    private Integer roomType;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 }

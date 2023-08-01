@@ -7,10 +7,12 @@ import com.jhc.chathub.common.constants.SystemConstant;
 import com.jhc.chathub.common.resp.Response;
 import com.jhc.chathub.mapper.FriendNoticeMapper;
 import com.jhc.chathub.mapper.FriendRelationMapper;
+import com.jhc.chathub.mapper.RoomMapper;
 import com.jhc.chathub.pojo.dto.friend.FriendApplication;
 import com.jhc.chathub.pojo.dto.friend.FriendApplicationReply;
 import com.jhc.chathub.pojo.entity.FriendNotice;
 import com.jhc.chathub.pojo.entity.FriendRelation;
+import com.jhc.chathub.pojo.entity.Room;
 import com.jhc.chathub.pojo.entity.User;
 import com.jhc.chathub.service.IFriendService;
 import com.jhc.chathub.service.IUserService;
@@ -32,6 +34,9 @@ public class FriendServiceImpl extends ServiceImpl<FriendRelationMapper, FriendR
 
     @Resource
     private FriendNoticeMapper friendNoticeMapper;
+
+    @Resource
+    private RoomMapper roomMapper;
 
     private boolean isFriend(Long selfId, Long otherId) {
         String key = RedisConstant.USER_FRIEND_KEY + selfId;
@@ -115,10 +120,14 @@ public class FriendServiceImpl extends ServiceImpl<FriendRelationMapper, FriendR
             String otherKey = RedisConstant.USER_FRIEND_KEY + otherId;
             stringRedisTemplate.opsForSet().add(otherKey, selfId.toString());
 
-            // 3.2创建好友关系
+            // 3.2创建好友关系以及会话id
             FriendRelation friendRelation = new FriendRelation();
+            Room room = new Room();
+            room.setRoomType(SystemConstant.ROOM_TYPE_SINGLE);
+            roomMapper.insert(room);
             friendRelation.setUserId1(selfId)
-                    .setUserId2(otherId);
+                    .setUserId2(otherId)
+                    .setRoomId(room.getId());
 
             // 3.3将好友关系存入数据库, 更新双方好友数量
             save(friendRelation);
@@ -162,6 +171,8 @@ public class FriendServiceImpl extends ServiceImpl<FriendRelationMapper, FriendR
                 .or()
                 .eq("user_id1", id)
                 .eq("user_id2", selfId);
+        FriendRelation friendRelation = getOne(queryWrapper);
+        roomMapper.deleteById(friendRelation.getRoomId());
         remove(queryWrapper);
         userService.update().setSql("friend_count = friend_count - 1").eq("id", selfId).update();
         userService.update().setSql("friend_count = friend_count - 1").eq("id", id).update();

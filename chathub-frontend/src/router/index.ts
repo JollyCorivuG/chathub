@@ -57,6 +57,14 @@ export default createRouter({
             component: () => import('@/views/user_page/index.vue'),
         },
         {
+            path: '/friend_chat',
+            component: () => import('@/views/friend_chat/index.vue'),
+        },
+        {
+            path: '/group_chat',
+            component: () => import('@/views/group_chat/index.vue'),
+        },
+        {
             path: '/404',
             component: () => import('@/views/404/index.vue')
         }

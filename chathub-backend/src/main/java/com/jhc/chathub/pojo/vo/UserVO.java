@@ -19,4 +19,5 @@ public class UserVO {
     private Boolean isOnline;
     private Boolean isFriend;
     private LocalDateTime becomeFriendTime;
+    private Long roomId;
 }

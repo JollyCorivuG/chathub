@@ -58,7 +58,7 @@
         <van-action-bar-icon icon="good-job-o" text="点赞" />
         <van-action-bar-icon icon="share-o" text="分享" />
         <van-action-bar-button color="#EE0A24" text="删除好友" @click="deleteFriend"/>
-        <van-action-bar-button type="primary" text="发送消息" />
+        <van-action-bar-button type="primary" text="发送消息" @click="goChatPage"/>
     </van-action-bar>
 </template>
 
@@ -93,7 +93,6 @@ const active = ref<string>('other-info')
 // 其他信息, 包括好友数量、群组数量
 const fixed = ref<number>(100)
 const becomeFriendDays = ref<number>(0)
-
 // TODO 共同好友
 
 // 删除好友
@@ -111,6 +110,17 @@ const deleteFriend = async () => {
 const router = useRouter()
 const goBack = () => {
     router.push('/home/contact')
+}
+
+// 点击发送消息按钮
+const goChatPage = () => {
+    router.push({
+        path: '/friend_chat',
+        query: {
+            friendId: userInfo.value.id,
+            roomId: userInfo.value.roomId
+        }
+    })
 }
 </script>
 

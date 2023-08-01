@@ -34,4 +34,8 @@ public class SystemConstant {
     public static final Integer WS_HEAD_SHAKE_SUCCESS_MSG = 1; // 握手成功消息
     public static final Integer WS_HEAD_SHAKE_FAIL_MSG = 2; // 握手失败消息
 
+    // room类型
+    public static final Integer ROOM_TYPE_SINGLE = 0; // 单聊
+    public static final Integer ROOM_TYPE_GROUP = 1; // 群聊
+
 }

@@ -152,7 +152,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             QueryWrapper<FriendRelation> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("user_id1", selfId).eq("user_id2", userId).or()
                     .eq("user_id1", userId).eq("user_id2", selfId);
-            userVO.setBecomeFriendTime(friendRelationMapper.selectOne(queryWrapper).getCreateTime());
+            FriendRelation friendRelation = friendRelationMapper.selectOne(queryWrapper);
+            userVO.setBecomeFriendTime(friendRelation.getCreateTime());
+            userVO.setRoomId(friendRelation.getRoomId());
         }
         return userVO.setIsOnline(isOnline).setIsFriend(isFriend);
     }

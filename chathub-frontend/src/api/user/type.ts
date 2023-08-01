@@ -46,6 +46,7 @@ export interface UserInfo {
     isOnline: boolean,
     isFriend: boolean,
     becomeFriendTime: string,
+    roomId: number,
 }
 
 // 获取用户信息响应信息
