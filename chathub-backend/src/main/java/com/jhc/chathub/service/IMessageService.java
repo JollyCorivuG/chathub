@@ -1,6 +1,8 @@
 package com.jhc.chathub.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.jhc.chathub.common.resp.CursorPageBaseResp;
+import com.jhc.chathub.pojo.dto.message.MsgPageReq;
 import com.jhc.chathub.pojo.dto.message.SendMsgDTO;
 import com.jhc.chathub.pojo.entity.Message;
 import com.jhc.chathub.pojo.vo.ShowMsgVO;
@@ -8,4 +10,6 @@ import com.jhc.chathub.pojo.vo.ShowMsgVO;
 public interface IMessageService extends IService<Message> {
     Long sendMsg(SendMsgDTO sendMsg);
     ShowMsgVO convertToShowMsgVO(Message message);
+
+    CursorPageBaseResp<ShowMsgVO> getMsgPage(MsgPageReq msgPageReq);
 }

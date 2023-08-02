@@ -83,5 +83,4 @@ class ChathubApplicationTests {
 		System.out.println(message.getExtra().getImgMsg().getUrl());
 		System.out.println(message);
 	}
-
 }

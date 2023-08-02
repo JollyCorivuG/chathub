@@ -8,7 +8,12 @@
     </div>
     <div class="offset"></div>
     <div class="content">
-        <div class="message-panel"></div>
+        <div class="message-panel">
+            <div v-for="(msg, index) in msgList" :key="index">
+                {{msg.message}}
+            </div>
+            <van-button type="primary" @click="getMsgList">获取历史消息</van-button>
+        </div>
     </div>
 
     <div style="height: 42px;background-color: #F0F0F0;"></div>
@@ -31,17 +36,21 @@
 <!--            TODO 上传文件-->
             <van-icon name="paid" size="1.8em"></van-icon>
         </div>
-        <van-button type="primary" block style="height: 2.1em;width: 6em;" :disabled="content.length == 0">发送</van-button>
+        <van-button type="primary" block style="height: 2.1em;width: 6em;" :disabled="content.length == 0" @click="sendMsg">发送</van-button>
     </div>
 </template>
 
 <script setup lang="ts">
 import {useRouter, useRoute} from "vue-router";
-import {onMounted, ref} from "vue";
+import {ref} from "vue";
 import {GetUserInfoResponse, UserInfo} from "@/api/user/type.ts";
 import {reqGetUserInfoById} from "@/api/user";
 import {showNotify, UploaderFileListItem} from "vant";
 import {getEmoji} from "@/utils/emoji.ts";
+import {reqUploadFile} from "@/api/upload";
+import {UploadFileResponse} from "@/api/upload/type.ts";
+import {TextMsg, SendMsg, MsgType, SendMsgResponse, ShowMsg, MessageListResponse} from "@/api/message/type.ts";
+import {reqMessageList, reqSendMsg} from "@/api/message";
 
 // 返回上一页
 const router = useRouter()
@@ -62,19 +71,49 @@ const mxImgSize = ref<number>(1024 * 1024)
 const overMxImgSize = () => {
     showNotify({type: 'danger', message: '图片大小不能超过1MB！'})
 }
-const sendImg = () => {
+const sendImg = async () => {
     if (sendImgList.value.length == 0) {
         showNotify({type: 'danger', message: '请选择一张图片！'})
     }
+    // 将图片长传到服务器
     const img: UploaderFileListItem = sendImgList.value[0]
-    // 得到img的宽度和高度
+    const file: File = new File([img.file as any], <string>img.file?.name, {type: img.file?.type})
+    const formData = new FormData()
+    formData.append('file', file)
+    const resp: UploadFileResponse = await reqUploadFile(formData)
+    if (resp.statusCode != 0) {
+        showNotify({type: 'danger', message: resp.statusMsg})
+        return
+    }
+
+    // TODO 发送消息业务
 }
 
+// 发送文本消息
+const content = ref<string>('')
+const sendMsg = async () => {
+    const msgBody: TextMsg = {
+        content: content.value
+    }
+    const msg: SendMsg = {
+        roomId: roomId.value,
+        msgType: MsgType.TEXT,
+        body: msgBody
+    }
+    const resp: SendMsgResponse = await reqSendMsg(msg)
+    if (resp.statusCode != 0) {
+        showNotify({type: 'danger', message: resp.statusMsg})
+        return
+    }
+    msgList.value.push(resp.data)
+    content.value = ''
+}
 
 // 当页面渲染后, 拿到数据
 const route = useRoute()
 const friendInfo = ref<UserInfo>({} as UserInfo)
-// const roomId: number = Number(useRoute().query.roomId)
+const roomId = ref<number>(Number(useRoute().query.roomId))
+const msgList = ref<ShowMsg[]>([] as ShowMsg[])
 
 // 得到用户信息
 const getFriendInfo = async () => {
@@ -88,10 +127,23 @@ const getFriendInfo = async () => {
 }
 getFriendInfo()
 
-// 输入框内容
-const content = ref<string>('123')
-
-
+// 得到消息列表
+const cursor = ref<string>('')
+const isLastPage = ref<boolean>(false)
+const getMsgList = async () => {
+    if (isLastPage.value) {
+        return
+    }
+    const resp: MessageListResponse = await reqMessageList(roomId.value, cursor.value)
+    if (resp.statusCode != 0) {
+        showNotify({type: 'danger', message: resp.statusMsg})
+        return
+    }
+    msgList.value.unshift(...resp.data.list.reverse())
+    cursor.value = resp.data.cursor
+    isLastPage.value = resp.data.isLast
+}
+getMsgList()
 
 </script>
 
@@ -137,7 +189,7 @@ const content = ref<string>('123')
         padding: 0 3px;
         display: flex;
         align-items: center;
-        margin-top: 2px;
+        margin-top: 3px;
     }
     ::v-deep(.van-cell) {
         padding: 1px 0;

@@ -3,12 +3,14 @@ package com.jhc.chathub.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jhc.chathub.common.constants.SystemConstant;
+import com.jhc.chathub.common.resp.CursorPageBaseResp;
 import com.jhc.chathub.event.MessageSendEvent;
 import com.jhc.chathub.mapper.MessageMapper;
 import com.jhc.chathub.pojo.dto.message.*;
 import com.jhc.chathub.pojo.entity.Message;
 import com.jhc.chathub.pojo.vo.ShowMsgVO;
 import com.jhc.chathub.service.IMessageService;
+import com.jhc.chathub.utils.CursorUtils;
 import com.jhc.chathub.utils.UserHolder;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -74,5 +76,17 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
 
         // 3.返回保存的消息
         return saveMsg.getId();
+    }
+
+    @Override
+    public CursorPageBaseResp<ShowMsgVO> getMsgPage(MsgPageReq msgPageReq) {
+        // 1.查询出CursorPageBaseResp<Message>
+        CursorPageBaseResp<Message> msgPage = CursorUtils.getCursorPageByMysql(this, msgPageReq, wrapper -> wrapper.eq(Message::getRoomId, msgPageReq.getRoomId()), Message::getId);
+        if (msgPage.isEmpty()) {
+            return CursorPageBaseResp.empty();
+        }
+
+        // 2.将msgPage中的list类型转换为List<ShowMsgVO>
+        return CursorPageBaseResp.change(msgPage, msgPage.getList().stream().map(this::convertToShowMsgVO).toList());
     }
 }
