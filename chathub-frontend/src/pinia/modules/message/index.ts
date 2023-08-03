@@ -11,7 +11,8 @@ const useMsgStore = defineStore('Msg', {
             msgList: [] as ShowMsg[],
             roomId: 0,
             isLastPage: false,
-            cursor: ''
+            cursor: '',
+            isReceiveMsg: false
         }
     },
     getters: {

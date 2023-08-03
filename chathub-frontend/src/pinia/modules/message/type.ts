@@ -4,5 +4,6 @@ export interface MsgState {
     msgList: ShowMsg[],
     roomId: number
     isLastPage: boolean,
-    cursor: string
+    cursor: string,
+    isReceiveMsg: boolean
 }

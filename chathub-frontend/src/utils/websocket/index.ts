@@ -51,6 +51,8 @@ export class WS {
                 }
             }
             msgStore.msgList.push(showMsg)
+            msgStore.isReceiveMsg = !msgStore.isReceiveMsg
+
         }
     }
 

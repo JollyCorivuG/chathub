@@ -74,7 +74,7 @@
 
 <script setup lang="ts">
 import {useRoute, useRouter} from "vue-router";
-import {nextTick, onMounted, ref} from "vue";
+import {nextTick, onMounted, ref, watch} from "vue";
 import {GetUserInfoResponse, UserInfo} from "@/api/user/type.ts";
 import {reqGetUserInfoById} from "@/api/user";
 import {showNotify, UploaderFileListItem} from "vant";
@@ -203,11 +203,9 @@ const loadMoreMsg = async () => {
     if (scrollTop == 0) {
         isLoading.value = true
         const num: number = await getMsgList()
-        console.log(num)
         await nextTick(() => {
             isLoading.value = false
             if (messagePanel.value) {
-                // 计算id从message-0到message-num的div的高度
                 let height = 0
                 for (let i = 0; i < num; i++) {
                     const div = document.getElementById('message' + i)
@@ -215,14 +213,22 @@ const loadMoreMsg = async () => {
                         height += div.clientHeight
                     }
                 }
-                console.log(height)
                 messagePanel.value.scrollTop = height
             }
         })
     }
 }
 
-
+// 监视msgStore.isReceiveMsg的变化, 如果发生变化就滚动到底部
+watch(() => msgStore.isReceiveMsg, async (newVal, oldVal) => {
+    if (newVal != oldVal) {
+        await nextTick(() => {
+            if (messagePanel.value) {
+                messagePanel.value.scrollTop = messagePanel.value.scrollHeight
+            }
+        })
+    }
+})
 
 </script>
 
