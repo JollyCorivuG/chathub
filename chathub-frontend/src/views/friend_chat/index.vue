@@ -6,19 +6,51 @@
         </div>
         <van-icon name="ellipsis" size="1.8em" color="#fff"></van-icon>
     </div>
-    <div class="offset"></div>
-    <div class="content">
-        <div class="message-panel">
-            <div v-for="(msg, index) in msgList" :key="index">
-                {{msg.message}}
+    <div class="offset">
+    </div>
+    <div class="loading" v-show="isLoading">
+        <van-button loading type="primary" loading-type="spinner" style="background-color: #F0F0F0; border: #F0F0F0; color: black"/>
+    </div>
+    <div class="content" ref="messagePanel" @mousewheel="loadMoreMsg">
+        <div v-for="(msg, index) in msgStore.msgList" :key="index" :id="'message' + index">
+            <div v-if="index != 0 && !isSameMinute(msg.message.sendTime, msgStore.msgList[index - 1].message.sendTime)" class="time">
+                {{formatTime(msg.message.sendTime)}}
             </div>
-            <van-button type="primary" @click="getMsgList">获取历史消息</van-button>
+            <div v-if="msg.fromUser.id == userStore.userInfo.id" class="right">
+                <div class="message">
+                    <div v-if="msg.message.msgType == MsgType.TEXT">
+                        {{msg.message.body.content}}
+                    </div>
+                    <div v-else-if="msg.message.msgType == MsgType.IMG">
+
+                    </div>
+                    <div v-else-if="msg.message.msgType == MsgType.FILE">
+
+                    </div>
+                </div>
+                <img :src="userStore.userInfo.avatarUrl" alt="user-avatar">
+            </div>
+            <div v-else class="left">
+                <img :src="userStore.userInfo.avatarUrl" alt="user-avatar">
+
+                <div class="message">
+                    <div v-if="msg.message.msgType == MsgType.TEXT">
+                        {{msg.message.body.content}}
+                    </div>
+                    <div v-else-if="msg.message.msgType == MsgType.IMG">
+
+                    </div>
+                    <div v-else-if="msg.message.msgType == MsgType.FILE">
+
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div style="height: 42px;background-color: #F0F0F0;"></div>
     <div class="bottom">
-        <van-field autosize type="textarea" :rows="1" v-model="content"/>
+        <van-field autosize type="textarea" :rows="1" v-model="content" @keyup.enter="sendMsg" />
         <div class="other-operator">
             <van-popover v-model:show="showEmojiPopover" placement="top" :show-arrow="false">
                 <ul class="emoji-list">
@@ -41,16 +73,21 @@
 </template>
 
 <script setup lang="ts">
-import {useRouter, useRoute} from "vue-router";
-import {ref} from "vue";
+import {useRoute, useRouter} from "vue-router";
+import {nextTick, onMounted, ref} from "vue";
 import {GetUserInfoResponse, UserInfo} from "@/api/user/type.ts";
 import {reqGetUserInfoById} from "@/api/user";
 import {showNotify, UploaderFileListItem} from "vant";
 import {getEmoji} from "@/utils/emoji.ts";
 import {reqUploadFile} from "@/api/upload";
 import {UploadFileResponse} from "@/api/upload/type.ts";
-import {TextMsg, SendMsg, MsgType, SendMsgResponse, ShowMsg, MessageListResponse} from "@/api/message/type.ts";
-import {reqMessageList, reqSendMsg} from "@/api/message";
+import {MsgType, SendMsg, SendMsgResponse, TextMsg} from "@/api/message/type.ts";
+import {reqSendMsg} from "@/api/message";
+import useMsgStore from "@/pinia/modules/message";
+import {WS} from "@/utils/websocket";
+import {buildWSUrl} from "@/utils/websocket/build_url.ts";
+import useUserStore from "@/pinia/modules/user";
+import {formatTime, isSameMinute} from "@/utils/time_format.ts";
 
 // 返回上一页
 const router = useRouter()
@@ -92,11 +129,17 @@ const sendImg = async () => {
 // 发送文本消息
 const content = ref<string>('')
 const sendMsg = async () => {
+    content.value = content.value.replace(/\n/g, '')
+    if (content.value.length == 0) {
+        showNotify({type: 'danger', message: '消息不能为空！'})
+        return
+    }
     const msgBody: TextMsg = {
         content: content.value
     }
+    content.value = ''
     const msg: SendMsg = {
-        roomId: roomId.value,
+        roomId: msgStore.roomId,
         msgType: MsgType.TEXT,
         body: msgBody
     }
@@ -105,15 +148,19 @@ const sendMsg = async () => {
         showNotify({type: 'danger', message: resp.statusMsg})
         return
     }
-    msgList.value.push(resp.data)
-    content.value = ''
+    msgStore.msgList.push(resp.data)
+    await nextTick(() => {
+        if (messagePanel.value) {
+            messagePanel.value.scrollTop = messagePanel.value.scrollHeight
+        }
+    })
 }
 
 // 当页面渲染后, 拿到数据
+const msgStore = useMsgStore()
 const route = useRoute()
 const friendInfo = ref<UserInfo>({} as UserInfo)
-const roomId = ref<number>(Number(useRoute().query.roomId))
-const msgList = ref<ShowMsg[]>([] as ShowMsg[])
+msgStore.roomId = Number(useRoute().query.roomId)
 
 // 得到用户信息
 const getFriendInfo = async () => {
@@ -128,22 +175,54 @@ const getFriendInfo = async () => {
 getFriendInfo()
 
 // 得到消息列表
-const cursor = ref<string>('')
-const isLastPage = ref<boolean>(false)
-const getMsgList = async () => {
-    if (isLastPage.value) {
-        return
-    }
-    const resp: MessageListResponse = await reqMessageList(roomId.value, cursor.value)
-    if (resp.statusCode != 0) {
-        showNotify({type: 'danger', message: resp.statusMsg})
-        return
-    }
-    msgList.value.unshift(...resp.data.list.reverse())
-    cursor.value = resp.data.cursor
-    isLastPage.value = resp.data.isLast
+const getMsgList = async (): Promise<number> => {
+    return await msgStore.getMsgList()
 }
-getMsgList()
+
+// 连接websocket
+const userStore = useUserStore()
+new WS(buildWSUrl(userStore.token, msgStore.roomId))
+
+// 让页面渲染完成后, 滚动到底部
+const messagePanel = ref<HTMLElement>()
+onMounted(async () => {
+    await getMsgList()
+    if (messagePanel.value) {
+        messagePanel.value.addEventListener('scroll', loadMoreMsg, true)
+        messagePanel.value.scrollTop = messagePanel.value.scrollHeight
+    }
+})
+
+// 当滚动条到达顶部时, 加载更多消息
+const isLoading = ref<boolean>(false)
+const loadMoreMsg = async () => {
+    if (isLoading.value) {
+        return
+    }
+    const scrollTop = messagePanel.value?.scrollTop
+    if (scrollTop == 0) {
+        isLoading.value = true
+        const num: number = await getMsgList()
+        console.log(num)
+        await nextTick(() => {
+            isLoading.value = false
+            if (messagePanel.value) {
+                // 计算id从message-0到message-num的div的高度
+                let height = 0
+                for (let i = 0; i < num; i++) {
+                    const div = document.getElementById('message' + i)
+                    if (div) {
+                        height += div.clientHeight
+                    }
+                }
+                console.log(height)
+                messagePanel.value.scrollTop = height
+            }
+        })
+    }
+}
+
+
 
 </script>
 
@@ -170,11 +249,10 @@ getMsgList()
 }
 
 .content {
+    padding-top: 18px;
     background-color: #F0F0F0;
-    min-height: calc(100vh - 8% - 42px);
-    .message-panel {
-        //height: 10000px;
-    }
+    height: calc(100vh - 8% - 42px);
+    overflow-y: scroll;
 }
 
 .bottom {
@@ -208,5 +286,59 @@ getMsgList()
         justify-content: center;
         font-size: 20px;
     }
+}
+
+.content {
+    img {
+        margin: 0 7px;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+    }
+    .left {
+        padding-bottom: 18px;
+        display: flex;
+        align-items: flex-start;
+        .message {
+            // 圆角上下左右
+            border-radius: 8px 8px 8px 8px;
+            max-width: 240px;
+            padding: 10px;
+            background-color: white;
+            color: black;
+            word-break: break-all;
+            display: flex;
+            align-items: center;
+        }
+    }
+    .right {
+        padding-bottom: 18px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-start;
+        .message {
+            display: flex;
+            align-items: center;
+            border-radius: 8px 8px 8px 8px;
+            max-width: 240px;
+            padding: 10px;
+            background-color: #0199FF;
+            color: white;
+            word-break: break-all;
+        }
+    }
+    .time {
+        padding-bottom: 18px;
+        text-align: center;
+        color: #8A8E99;
+        font-size: 15px;
+    }
+}
+.loading {
+    position: fixed;
+    z-index: 999;
+    display: flex;
+    justify-content: center;
+    width: 100%;
 }
 </style>

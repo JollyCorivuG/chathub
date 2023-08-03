@@ -54,7 +54,7 @@ const useUserStore = defineStore('User', {
             }
             return resp as CommonResponse
         },
-        async logout(): Promise<CommonResponse>{
+        async logout(): Promise<CommonResponse> {
             const resp: CommonResponse = await reqLogout()
             localStorage.clear()
             return resp as CommonResponse

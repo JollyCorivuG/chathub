@@ -39,7 +39,7 @@ export interface FileMsg {
 
 // 展示消息的类型
 export interface ShowMsg {
-    fromUserInfo: {
+    fromUser: {
         id: number,
     }
     message: {

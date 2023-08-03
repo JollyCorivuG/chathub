@@ -54,7 +54,8 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
         WSReqDTO wsReq = JSONUtil.toBean(msg.text(), WSReqDTO.class);
         WSReqEnum wsReqEnum = WSReqEnum.of(wsReq.getType());
         switch (wsReqEnum) {
-            case HEARTBEAT -> log.info("收到心跳包");
+            case HEARTBEAT -> {
+            }
             case AUTHORIZE -> log.info("收到认证包");
             default -> log.info("收到未知类型的包");
         }

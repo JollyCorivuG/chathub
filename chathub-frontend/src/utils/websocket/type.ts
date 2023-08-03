@@ -23,7 +23,7 @@ export interface WSRes<T> {
 
 // 从ws接收的他人发送的消息类型
 export interface OthersMsg {
-    fromUserInfo: {
+    fromUser: {
         id: number,
     }
     message: {

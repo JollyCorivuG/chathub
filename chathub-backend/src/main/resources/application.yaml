@@ -15,8 +15,8 @@ spring:
       host: 127.0.0.1
 mybatis-plus:
   type-aliases-package: com.jhc.chathub.pojo.entity
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 knife4j:
   enable: true
   setting:

@@ -68,12 +68,5 @@ export default createRouter({
             path: '/404',
             component: () => import('@/views/404/index.vue')
         }
-    ],
-    //滚动行为:控制滚动条的位置
-    scrollBehavior() {
-        return {
-            left: 0,
-            top: 0
-        }
-    }
+    ]
 })

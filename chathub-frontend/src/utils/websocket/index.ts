@@ -1,6 +1,11 @@
 import type {OthersMsg, WSReq, WSRes} from "@/utils/websocket/type.ts";
 import {WSReqType, WSResType} from "@/utils/websocket/type.ts";
 import {showNotify} from "vant";
+import useMsgStore from "@/pinia/modules/message";
+import {convertTimeStampToJavaTime} from "@/utils/time_format.ts";
+import {ShowMsg} from "@/api/message/type.ts";
+
+const msgStore = useMsgStore()
 
 export class WS {
     private wsClient: WebSocket // websocket客户端
@@ -32,10 +37,20 @@ export class WS {
                 this.sendMsg({type: WSReqType.HEARTBEAT})
             }, 10000)
         } else if (msg.type == WSResType.NORMAL_MSG) {
-            console.log('收到他人消息')
             const msg: WSRes<OthersMsg> = JSON.parse(event.data as string) as WSRes<OthersMsg>
-            // TODO 后续将这个放进消息队列中
             console.log(msg)
+            const showMsg: ShowMsg = {
+                fromUser: {
+                    id: msg.data?.fromUser.id as number,
+                },
+                message: {
+                    id: msg.data?.message.id as number,
+                    sendTime: convertTimeStampToJavaTime(<number>msg.data?.message.sendTime),
+                    msgType: msg.data?.message.msgType as number,
+                    body: msg.data?.message.body as object
+                }
+            }
+            msgStore.msgList.push(showMsg)
         }
     }
 
