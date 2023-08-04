@@ -1,5 +1,5 @@
 <template>
-    我是消息页面
+    <img :src="generateFileIcon('11.jpg')" alt="">
 </template>
 
 <script setup lang="ts">
@@ -11,6 +11,7 @@
 //     new WS(url)
 //
 // })
+import {generateFileIcon} from "@/utils/file.ts";
 </script>
 
 <style scoped lang="scss">
