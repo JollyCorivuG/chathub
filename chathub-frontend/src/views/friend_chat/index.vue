@@ -22,7 +22,7 @@
                         {{msg.message.body.content}}
                     </div>
                     <div v-else-if="msg.message.msgType == MsgType.IMG">
-                        <img :src="msg.message.body.imgMsg.url" alt="img-msg" :style="{height: msg.message.body.imgMsg.height + 'px', width: msg.message.body.imgMsg.width + 'px'}">
+                        <img :src="msg.message.body.imgMsg.url" alt="img-msg" :style="{height: msg.message.body.imgMsg.height + 'px', width: msg.message.body.imgMsg.width + 'px'}" @click="preview(msg.message.body.imgMsg.url)">
                     </div>
                     <div v-else-if="msg.message.msgType == MsgType.FILE">
 
@@ -37,7 +37,7 @@
                         {{msg.message.body.content}}
                     </div>
                     <div v-else-if="msg.message.msgType == MsgType.IMG">
-                        <img :src="msg.message.body.imgMsg.url" alt="img-msg" :style="{height: msg.message.body.imgMsg.height + 'px', width: msg.message.body.imgMsg.width + 'px'}">
+                        <img :src="msg.message.body.imgMsg.url" alt="img-msg" :style="{height: msg.message.body.imgMsg.height + 'px', width: msg.message.body.imgMsg.width + 'px'}" @click="preview(msg.message.body.imgMsg.url)">
                     </div>
                     <div v-else-if="msg.message.msgType == MsgType.FILE">
 
@@ -76,7 +76,7 @@ import {useRoute, useRouter} from "vue-router";
 import {nextTick, onMounted, ref, watch} from "vue";
 import {GetUserInfoResponse, UserInfo} from "@/api/user/type.ts";
 import {reqGetUserInfoById} from "@/api/user";
-import {showNotify, UploaderFileListItem} from "vant";
+import {showImagePreview, showNotify, UploaderFileListItem} from "vant";
 import {getEmoji} from "@/utils/emoji.ts";
 import {reqUploadFile} from "@/api/upload";
 import {UploadFileResponse} from "@/api/upload/type.ts";
@@ -155,6 +155,12 @@ const sendImg = async () => {
             }
         })
     }
+}
+const preview = (url: string) => {
+    showImagePreview({
+        images: [url],
+        startPosition: 0
+    })
 }
 
 // 发送文本消息
@@ -290,6 +296,7 @@ watch(() => msgStore.isReceiveMsg, async (newVal, oldVal) => {
     background-color: #F0F0F0;
     height: calc(100vh - 8% - 42px);
     overflow-y: scroll;
+    scroll-behavior: smooth;
 }
 
 .bottom {
