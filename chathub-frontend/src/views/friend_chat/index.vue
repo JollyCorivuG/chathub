@@ -17,28 +17,27 @@
                 {{formatTime(msg.message.sendTime)}}
             </div>
             <div v-if="msg.fromUser.id == userStore.userInfo.id" class="right">
-                <div class="message">
-                    <div v-if="msg.message.msgType == MsgType.TEXT">
+                <div>
+                    <div v-if="msg.message.msgType == MsgType.TEXT" class="message">
                         {{msg.message.body.content}}
                     </div>
                     <div v-else-if="msg.message.msgType == MsgType.IMG">
-
+                        <img :src="msg.message.body.imgMsg.url" alt="img-msg" :style="{height: msg.message.body.imgMsg.height + 'px', width: msg.message.body.imgMsg.width + 'px'}">
                     </div>
                     <div v-else-if="msg.message.msgType == MsgType.FILE">
 
                     </div>
                 </div>
-                <img :src="userStore.userInfo.avatarUrl" alt="user-avatar">
+                <img :src="userStore.userInfo.avatarUrl" alt="user-avatar" class="user-avatar">
             </div>
             <div v-else class="left">
-                <img :src="userStore.userInfo.avatarUrl" alt="user-avatar">
-
-                <div class="message">
-                    <div v-if="msg.message.msgType == MsgType.TEXT">
+                <img :src="userStore.userInfo.avatarUrl" alt="user-avatar" class="user-avatar">
+                <div>
+                    <div v-if="msg.message.msgType == MsgType.TEXT" class="message">
                         {{msg.message.body.content}}
                     </div>
                     <div v-else-if="msg.message.msgType == MsgType.IMG">
-
+                        <img :src="msg.message.body.imgMsg.url" alt="img-msg" :style="{height: msg.message.body.imgMsg.height + 'px', width: msg.message.body.imgMsg.width + 'px'}">
                     </div>
                     <div v-else-if="msg.message.msgType == MsgType.FILE">
 
@@ -81,7 +80,7 @@ import {showNotify, UploaderFileListItem} from "vant";
 import {getEmoji} from "@/utils/emoji.ts";
 import {reqUploadFile} from "@/api/upload";
 import {UploadFileResponse} from "@/api/upload/type.ts";
-import {MsgType, SendMsg, SendMsgResponse, TextMsg} from "@/api/message/type.ts";
+import {ImgMsg, MsgType, SendMsg, SendMsgResponse, TextMsg} from "@/api/message/type.ts";
 import {reqSendMsg} from "@/api/message";
 import useMsgStore from "@/pinia/modules/message";
 import {WS} from "@/utils/websocket";
@@ -112,18 +111,50 @@ const sendImg = async () => {
     if (sendImgList.value.length == 0) {
         showNotify({type: 'danger', message: '请选择一张图片！'})
     }
+
     // 将图片长传到服务器
-    const img: UploaderFileListItem = sendImgList.value[0]
-    const file: File = new File([img.file as any], <string>img.file?.name, {type: img.file?.type})
+    const rawImg: UploaderFileListItem = sendImgList.value[0]
+    const file: File = new File([rawImg.file as any], <string>rawImg.file?.name, {type: rawImg.file?.type})
     const formData = new FormData()
     formData.append('file', file)
     const resp: UploadFileResponse = await reqUploadFile(formData)
     if (resp.statusCode != 0) {
+        sendImgList.value = []
         showNotify({type: 'danger', message: resp.statusMsg})
         return
     }
-
-    // TODO 发送消息业务
+    sendImgList.value = []
+    const img: HTMLImageElement = new Image();
+    img.src = resp.data
+    img.onload = async () => {
+        const originWidth: number = img.width
+        img.width = 200 > img.width ? img.width : 200
+        img.height = img.height * (img.width / originWidth)
+        img.width = Math.floor(img.width)
+        img.height = Math.floor(img.height)
+        const msgBody: ImgMsg = {
+            size: rawImg.file?.size as number,
+            width: img.width,
+            height: img.height,
+            url: resp.data
+        }
+        const msg: SendMsg = {
+            roomId: msgStore.roomId,
+            msgType: MsgType.IMG,
+            body: msgBody
+        }
+        const resp1: SendMsgResponse = await reqSendMsg(msg)
+        if (resp1.statusCode != 0) {
+            showNotify({type: 'danger', message: resp1.statusMsg})
+            return
+        }
+        msgStore.msgList.push(resp1.data)
+        await nextTick(() => {
+            if (messagePanel.value) {
+                messagePanel.value.scrollTop = messagePanel.value.scrollHeight
+            }
+        })
+    }
 }
 
 // 发送文本消息
@@ -295,7 +326,7 @@ watch(() => msgStore.isReceiveMsg, async (newVal, oldVal) => {
 }
 
 .content {
-    img {
+    .user-avatar {
         margin: 0 7px;
         width: 38px;
         height: 38px;

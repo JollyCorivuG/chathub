@@ -8,7 +8,7 @@ export interface CommonResponse {
 export interface SendMsg {
     roomId: number,
     msgType: number,
-    body: object // 具体的消息体, 根据不同的消息类型, 传入不同的消息体
+    body: object | any // 具体的消息体, 根据不同的消息类型, 传入不同的消息体
 }
 
 export enum MsgType {
@@ -46,7 +46,7 @@ export interface ShowMsg {
         id: number,
         sendTime: string,
         msgType: number,
-        body: object
+        body: object | any
     }
 }
 

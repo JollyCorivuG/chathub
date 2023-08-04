@@ -6,7 +6,5 @@ export interface CommonResponse {
 
 // 上传文件响应信息
 export interface UploadFileResponse extends CommonResponse {
-    data: {
-        url: string
-    }
+    data: string
 }
