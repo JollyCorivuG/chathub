@@ -180,4 +180,20 @@ public class FriendServiceImpl extends ServiceImpl<FriendRelationMapper, FriendR
         // 4.返回响应
         return Response.success(null);
     }
+
+    @Override
+    public Long getRoomId(Long selfId, Long otherId) {
+        if (!isFriend(selfId, otherId)) {
+            throw new RuntimeException("该用户不是你的好友");
+        }
+        QueryWrapper<FriendRelation> queryWrapper = new QueryWrapper<>();
+        queryWrapper
+                .eq("user_id1", selfId)
+                .eq("user_id2", otherId)
+                .or()
+                .eq("user_id1", otherId)
+                .eq("user_id2", selfId);
+        FriendRelation friendRelation = getOne(queryWrapper);
+        return friendRelation.getRoomId();
+    }
 }

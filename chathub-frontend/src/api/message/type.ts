@@ -1,4 +1,6 @@
 // 通用响应信息
+import {UserInfo} from "@/api/user/type.ts";
+
 export interface CommonResponse {
     statusCode: number,
     statusMsg: string,
@@ -62,6 +64,22 @@ export interface MessageListResponse extends CommonResponse {
         cursor: string
         isLast: boolean
     }
+}
+
+// 会话类型
+export interface Room {
+    id: number,
+    roomType: number,
+    connectInfo: UserInfo,
+    latestMsg: ShowMsg,
+    unreadCount: number
+}
+
+export type RoomList = Room[]
+
+// 获取会话列表的响应类型
+export interface RoomListResponse extends CommonResponse {
+    data: RoomList
 }
 
 

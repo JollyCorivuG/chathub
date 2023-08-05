@@ -29,11 +29,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -226,5 +224,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         // 2.返回结果
         return Response.success(queryWithCondition(keyword, isPhone, isAccount, page));
+    }
+
+    @Override
+    public List<Long> queryFriendIds(Long userId) {
+        Set<String> friendsId = stringRedisTemplate.opsForSet().members(RedisConstant.USER_FRIEND_KEY + userId.toString());
+        if (friendsId == null || friendsId.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return friendsId.stream().map(Long::parseLong).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Long> queryGroupIds(Long userId) {
+        // TODO
+        return Collections.emptyList();
     }
 }

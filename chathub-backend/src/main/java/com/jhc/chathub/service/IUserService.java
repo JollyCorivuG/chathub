@@ -27,4 +27,8 @@ public interface IUserService extends IService<User> {
     UserVO convertUserToUserVO(Long selfId, User user);
 
     UserDTO getUserByToken(String token);
+
+    List<Long> queryFriendIds(Long userId);
+
+    List<Long> queryGroupIds(Long userId);
 }

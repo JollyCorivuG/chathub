@@ -16,6 +16,9 @@
             <div v-if="index != 0 && !isSameMinute(msg.message.sendTime, msgStore.msgList[index - 1].message.sendTime)" class="time">
                 {{formatTime(msg.message.sendTime)}}
             </div>
+            <div v-else-if="index == 0" class="time">
+                {{formatTime(msg.message.sendTime)}}
+            </div>
             <div v-if="msg.fromUser.id == userStore.userInfo.id" class="right">
                 <div>
                     <div v-if="msg.message.msgType == MsgType.TEXT" class="message">
@@ -103,6 +106,7 @@ import {calcMB, generateFileIcon} from "@/utils/file.ts";
 const router = useRouter()
 const goBack = () => {
     router.push('/home/message')
+    ws.closeConnect()
 }
 
 // 发送表情包
@@ -292,11 +296,12 @@ const getMsgList = async (): Promise<number> => {
 
 // 连接websocket
 const userStore = useUserStore()
-new WS(buildWSUrl(userStore.token, msgStore.roomId))
+const ws: WS = new WS(buildWSUrl(userStore.token, msgStore.roomId))
 
 // 让页面渲染完成后, 滚动到底部
 const messagePanel = ref<HTMLElement>()
 onMounted(async () => {
+    msgStore.initData()
     await getMsgList()
     if (messagePanel.value) {
         messagePanel.value.addEventListener('scroll', loadMoreMsg, true)
@@ -381,7 +386,7 @@ watch(() => msgStore.isReceiveMsg, async (newVal, oldVal) => {
     padding-top: 18px;
     background-color: #F0F0F0;
     height: calc(100vh - 8% - 42px);
-    overflow-y: scroll;
+    overflow-y: auto;
     //scroll-behavior: smooth;
 }
 

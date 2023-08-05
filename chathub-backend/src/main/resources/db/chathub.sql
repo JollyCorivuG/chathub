@@ -62,4 +62,6 @@ CREATE TABLE `tb_room`  (
        `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
        `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
        PRIMARY KEY (`id`) USING BTREE
-)
+);
+
+DROP TABLE IF EXISTS `tb_user_delete_room`;

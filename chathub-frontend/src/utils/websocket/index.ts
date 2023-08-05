@@ -80,4 +80,9 @@ export class WS {
             this.wsClient.send(JSON.stringify(msg))
         }
     }
+
+    // 断开连接 (暴露给外部的方法)
+    public closeConnect = (): void => {
+        this.wsClient.close()
+    }
 }

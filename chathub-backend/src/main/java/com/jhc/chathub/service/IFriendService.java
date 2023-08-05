@@ -12,4 +12,6 @@ public interface IFriendService extends IService<FriendRelation> {
     Response<Void> acceptFriendApplication(FriendApplicationReply friendApplicationReply);
 
     Response<Void> deleteFriend(Long id);
+
+    Long getRoomId(Long selfId, Long otherId);
 }

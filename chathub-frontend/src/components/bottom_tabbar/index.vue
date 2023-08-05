@@ -1,6 +1,7 @@
 <template>
     <van-tabbar v-model="selected" @change="onChange">
-        <van-tabbar-item name="message" icon="chat-o">消息</van-tabbar-item>
+        <van-tabbar-item name="message" icon="chat-o" v-if="msgStore.unReadMsgCount > 0" :badge="msgStore.unReadMsgCount">消息</van-tabbar-item>
+        <van-tabbar-item name="message" icon="chat-o" v-else>消息</van-tabbar-item>
         <van-tabbar-item name="contact" icon="friends-o">联系人</van-tabbar-item>
         <van-tabbar-item name="notice" icon="bullhorn-o">通知</van-tabbar-item>
         <van-tabbar-item name="trend" icon="star-o">动态</van-tabbar-item>
@@ -10,6 +11,10 @@
 <script setup lang="ts">
 import {ref} from "vue";
 import {useRouter, useRoute} from "vue-router";
+import useMsgStore from "@/pinia/modules/message";
+
+// 未读消息数量
+const msgStore = useMsgStore()
 
 // tab拦切换
 const router = useRouter()

@@ -5,6 +5,8 @@ import cn.hutool.json.JSONUtil;
 import com.jhc.chathub.common.constants.SystemConstant;
 import com.jhc.chathub.common.resp.WSResponse;
 import com.jhc.chathub.pojo.dto.user.UserDTO;
+import com.jhc.chathub.pojo.vo.ShowMsgVO;
+import com.jhc.chathub.service.IMessageService;
 import com.jhc.chathub.service.IUserService;
 import com.jhc.chathub.service.IWebSocketService;
 import com.jhc.chathub.websocket.NettyUtil;
@@ -24,6 +26,9 @@ import java.util.concurrent.Executors;
 public class WebSocketServiceImpl implements IWebSocketService {
     @Resource
     private IUserService userService;
+
+    @Resource
+    private IMessageService messageService;
 
     // 房间号 -> channels
     // CopyOnWriteArrayList: 读写分离的list, 读不加锁, 写加锁
@@ -85,6 +90,11 @@ public class WebSocketServiceImpl implements IWebSocketService {
 
     private void sendMsgByChannel(Channel channel, WSResponse<?> wsResponse) {
         channel.writeAndFlush(new TextWebSocketFrame(JSONUtil.toJsonStr(wsResponse)));
+        if (wsResponse.getData() instanceof ShowMsgVO msg) {
+            messageService.updateUserReadLatestMsg(NettyUtil.getAttr(channel, NettyUtil.UID), NettyUtil.getAttr(channel, NettyUtil.ROOM_ID),
+                    msg.getMessage().getId());
+        }
+
     }
 
     @Override

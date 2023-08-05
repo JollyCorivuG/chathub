@@ -12,7 +12,8 @@ const useMsgStore = defineStore('Msg', {
             roomId: 0,
             isLastPage: false,
             cursor: '',
-            isReceiveMsg: false
+            isReceiveMsg: false,
+            unReadMsgCount: 0
         }
     },
     getters: {
@@ -32,6 +33,11 @@ const useMsgStore = defineStore('Msg', {
             this.cursor = resp.data.cursor
             this.isLastPage = resp.data.isLast
             return resp.data.list.length
+        },
+        initData() {
+            this.msgList = []
+            this.isLastPage = false
+            this.cursor = ''
         }
     }
 })

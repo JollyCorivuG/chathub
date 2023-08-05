@@ -19,4 +19,13 @@ public class RedisConstant {
     // 缓存查询用户
     public static final String CACHE_QUERY_USER_KET = "cache:users:";
     public static final Integer CACHE_QUERY_USER_KEY_TTL = 2;
+
+    // 记录用户对于一个房间最新的已读消息id, key为用户id:房间id
+    public static final String USER_READ_LATEST_MESSAGE = "user:read:latest:message:";
+
+    // 记录每个房间最新的消息id, key为房间id
+    public static final String ROOM_LATEST_MESSAGE = "room:latest:message:";
+
+    // 记录用户删除一个会话时, 当前会话的最新消息id, key为用户id:会话id
+    public static final String USER_DELETE_LATEST_MESSAGE = "user:delete:latest:message:";
 }

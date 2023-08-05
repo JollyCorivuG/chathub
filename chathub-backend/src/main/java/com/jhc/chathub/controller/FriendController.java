@@ -1,6 +1,5 @@
 package com.jhc.chathub.controller;
 
-import com.jhc.chathub.common.constants.RedisConstant;
 import com.jhc.chathub.common.resp.Response;
 import com.jhc.chathub.mapper.UserMapper;
 import com.jhc.chathub.pojo.dto.friend.FriendApplication;
@@ -15,9 +14,7 @@ import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/friends")
@@ -51,10 +48,7 @@ public class FriendController {
     @Operation(summary = "获取好友列表")
     public Response<List<UserVO>> getFriendList() {
         Long selfId = UserHolder.getUser().getId();
-        Set<String> friendsId = stringRedisTemplate.opsForSet().members(RedisConstant.USER_FRIEND_KEY + selfId.toString());
-        if (friendsId == null || friendsId.isEmpty()) {
-            return Response.success(Collections.emptyList());
-        }
+        List<Long> friendsId = userService.queryFriendIds(selfId);
         List<UserVO> userVOList = userMapper.selectBatchIds(friendsId).stream()
                 .map(user -> userService.convertUserToUserVO(selfId, user))
                 .sorted((o1, o2) -> {
