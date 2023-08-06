@@ -35,6 +35,12 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
     }
     // 如果已经登录, 则进行登出操作
     if (token) {
+        if (to.path == '/login') {
+            next('/home')
+            return
+        }
+
+        // 如果是从其他页面跳转到登录页面, 则进行登出操作
         const userStore = useUserStore()
         await userStore.logout()
         showNotify({type: 'primary', message: '已退出登录!'})

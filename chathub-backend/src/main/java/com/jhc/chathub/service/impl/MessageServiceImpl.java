@@ -189,4 +189,11 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         });
         return rooms;
     }
+
+    @Override
+    public void deleteRoom(Long userId, Long roomId) {
+        String key = RedisConstant.USER_DELETE_LATEST_MESSAGE + userId + ":" + roomId;
+        Long roomCurLatestMsgId = Long.valueOf(Objects.requireNonNull(stringRedisTemplate.opsForValue().get(RedisConstant.ROOM_LATEST_MESSAGE + roomId)));
+        stringRedisTemplate.opsForValue().set(key, String.valueOf(roomCurLatestMsgId));
+    }
 }

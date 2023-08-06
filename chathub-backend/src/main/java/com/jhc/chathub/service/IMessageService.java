@@ -20,4 +20,6 @@ public interface IMessageService extends IService<Message> {
     CursorPageBaseResp<ShowMsgVO> getMsgPage(MsgPageReq msgPageReq);
 
     List<RoomVO> getRoomList();
+
+    void deleteRoom(Long userId, Long id);
 }

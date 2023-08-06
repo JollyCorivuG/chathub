@@ -14,7 +14,7 @@
                             [图片]
                         </span>
                         <span v-else-if="room.latestMsg.message.msgType == MsgType.FILE">
-                            [文件] {{room.latestMsg.message.body.fileMsg.fileName}}
+                            [文件] {{room.latestMsg.message.body.fileMsg?.fileName}}
                         </span>
                     </div>
                 </div>
@@ -28,7 +28,7 @@
                 </div>
             </div>
             <template #right>
-                <van-button square text="删除" type="danger" style="height: 100%" />
+                <van-button square text="删除" type="danger" style="height: 100%" @click="deleteRoom(room.id)"/>
             </template>
         </van-swipe-cell>
     </van-pull-refresh>
@@ -36,9 +36,9 @@
 
 <script setup lang="ts">
 // 获取会话列表
-import {onMounted, ref} from "vue";
-import type {Room, RoomList, RoomListResponse} from "@/api/message/type.ts";
-import {reqRoomList} from "@/api/message";
+import {onBeforeUnmount, onMounted, ref} from "vue";
+import type {CommonResponse, Room, RoomList, RoomListResponse} from "@/api/message/type.ts";
+import {reqDeleteRoom, reqRoomList} from "@/api/message";
 import {showNotify} from "vant";
 import {MsgType} from "@/api/message/type.ts";
 import {formatTime} from "@/utils/time_format.ts";
@@ -85,11 +85,25 @@ const getUnreadMsgCount = () => {
     }
 }
 
+// 删除会话
+const deleteRoom = async (roomId: number) => {
+    const resp: CommonResponse = await reqDeleteRoom(roomId)
+    if (resp.statusCode != 0) {
+        showNotify({type: 'danger', message: resp.statusMsg})
+        return
+    }
+    roomList.value = roomList.value.filter(room => room.id != roomId)
+}
+
 // 当页面渲染完毕后，开启定时器，每隔一段时间刷新一次会话列表
 onMounted(() => {
-    setInterval(() => {
+    const polling = setInterval(() => {
         getRoomList()
     }, 2000)
+    // 当页面销毁时，清除定时器
+    onBeforeUnmount(() => {
+        clearInterval(polling)
+    })
 })
 </script>
 
@@ -99,7 +113,7 @@ onMounted(() => {
     overflow: auto;
 }
 .room {
-    // 被点击时的背景色为灰色
+    // 被点击时的背景色立刻变成灰色
     &:active {
         background-color: #eee;
     }

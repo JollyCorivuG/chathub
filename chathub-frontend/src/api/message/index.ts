@@ -1,4 +1,4 @@
-import type {RoomListResponse, SendMsg} from "@/api/message/type.ts";
+import type {CommonResponse, RoomListResponse, SendMsg} from "@/api/message/type.ts";
 import request from "@/utils/request.ts";
 import {SendMsgResponse, MessageListResponse} from "@/api/message/type.ts";
 
@@ -9,6 +9,8 @@ enum MessageApi {
     messageListUrl = '/messages/list',
     // 获取会话列表
     roomListUrl = '/messages/room',
+    // 删除会话
+    deleteRoomUrl = '/messages/room'
 }
 
 // 发送消息
@@ -19,3 +21,6 @@ export const reqMessageList = (roomId: number, cursor: string) => request.get<an
 
 // 获取会话列表
 export const reqRoomList = () => request.get<any, RoomListResponse>(MessageApi.roomListUrl)
+
+// 删除会话
+export const reqDeleteRoom = (roomId: number) => request.delete<any, CommonResponse>(MessageApi.deleteRoomUrl + '/' + roomId)

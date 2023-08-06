@@ -39,6 +39,12 @@ export interface FileMsg {
     fileName: string
 }
 
+export interface MsgBody {
+    content?: string,
+    imgMsg?: ImgMsg,
+    fileMsg?: FileMsg
+}
+
 // 展示消息的类型
 export interface ShowMsg {
     fromUser: {
@@ -48,7 +54,7 @@ export interface ShowMsg {
         id: number,
         sendTime: string,
         msgType: number,
-        body: object | any
+        body: MsgBody
     }
 }
 

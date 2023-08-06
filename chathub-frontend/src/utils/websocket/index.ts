@@ -3,7 +3,7 @@ import {WSReqType, WSResType} from "@/utils/websocket/type.ts";
 import {showNotify} from "vant";
 import useMsgStore from "@/pinia/modules/message";
 import {convertTimeStampToJavaTime} from "@/utils/time_format.ts";
-import {ShowMsg} from "@/api/message/type.ts";
+import {MsgBody, ShowMsg} from "@/api/message/type.ts";
 
 const msgStore = useMsgStore()
 
@@ -47,7 +47,7 @@ export class WS {
                     id: msg.data?.message.id as number,
                     sendTime: convertTimeStampToJavaTime(<number>msg.data?.message.sendTime),
                     msgType: msg.data?.message.msgType as number,
-                    body: msg.data?.message.body as object
+                    body: msg.data?.message.body as MsgBody
                 }
             }
             msgStore.msgList.push(showMsg)

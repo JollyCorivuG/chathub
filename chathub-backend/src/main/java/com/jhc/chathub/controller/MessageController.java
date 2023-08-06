@@ -7,6 +7,7 @@ import com.jhc.chathub.pojo.dto.message.SendMsgDTO;
 import com.jhc.chathub.pojo.vo.RoomVO;
 import com.jhc.chathub.pojo.vo.ShowMsgVO;
 import com.jhc.chathub.service.IMessageService;
+import com.jhc.chathub.utils.UserHolder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -40,5 +41,13 @@ public class MessageController {
     public Response<List<RoomVO>> getRoomList() {
         List<RoomVO> roomList = messageService.getRoomList();
         return Response.success(roomList);
+    }
+
+    @DeleteMapping("/room/{id}")
+    @Operation(summary = "删除房间")
+    public Response<Void> deleteRoom(@PathVariable Long id) {
+        Long userId = UserHolder.getUser().getId();
+        messageService.deleteRoom(userId, id);
+        return Response.success(null);
     }
 }
