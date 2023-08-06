@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/friends")
+@RequestMapping("/friends")
 @Tag(name = "好友相关接口")
 public class FriendController {
     @Resource

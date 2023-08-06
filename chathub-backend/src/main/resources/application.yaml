@@ -1,6 +1,16 @@
 server:
   port: 8081
+  address: 0.0.0.0
+  servlet:
+    context-path: /api
+    session:
+      cookie:
+        max-age: 2592000
 spring:
+  application:
+    name: chathub
+  profiles:
+    active: dev
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/chathub?useSSL=false&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true
@@ -15,8 +25,8 @@ spring:
       host: 127.0.0.1
   servlet:
     multipart:
-      max-file-size: 1GB
-      max-request-size: 1GB
+      max-file-size: 100MB
+      max-request-size: 100MB
 mybatis-plus:
   type-aliases-package: com.jhc.chathub.pojo.entity
 #  configuration:

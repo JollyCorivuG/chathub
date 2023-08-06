@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/notices")
+@RequestMapping("/notices")
 @Tag(name = "通知相关接口")
 public class NoticeController {
     @Resource

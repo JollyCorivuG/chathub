@@ -28,10 +28,10 @@ public class MvcConfig implements WebMvcConfigurer {
                         "/favicon.ico",
                         "/v3/api-docs/**",
                         "/upload/**",
-                        "/api/users/login",
-                        "/api/users/register",
-                        "/api/users/phone_code/**",
-                        "/api/users/phone_login"
+                        "/users/login",
+                        "/users/register",
+                        "/users/phone_code/**",
+                        "/users/phone_login"
                 ).order(1);
     }
 

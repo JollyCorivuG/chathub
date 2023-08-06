@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api/oss")
+@RequestMapping("/oss")
 @Tag(name = "OSS相关接口")
 public class OSSController {
     @Resource
