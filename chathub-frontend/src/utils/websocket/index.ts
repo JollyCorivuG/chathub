@@ -9,7 +9,7 @@ const msgStore = useMsgStore()
 
 export class WS {
     private wsClient: WebSocket // websocket客户端
-    private heartbeatTimer: NodeJS.Timeout | null = null
+    private heartbeatTimer: number = 0 // 心跳检测定时器
     constructor(url: string) {
         this.wsClient = new WebSocket(url)
         // 收到消息

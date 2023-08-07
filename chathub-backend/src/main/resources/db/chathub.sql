@@ -1,3 +1,5 @@
+CREATE DATABASE chathub DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
 DROP TABLE IF EXISTS `tb_user`;
 CREATE TABLE `tb_user`  (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -64,4 +66,3 @@ CREATE TABLE `tb_room`  (
        PRIMARY KEY (`id`) USING BTREE
 );
 
-DROP TABLE IF EXISTS `tb_user_delete_room`;

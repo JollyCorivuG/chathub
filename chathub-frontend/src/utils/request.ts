@@ -6,7 +6,7 @@ import useUserStore from "@/pinia/modules/user";
 
 // 创建一个axios实例: 可以设置基础路径, 超时时间等
 const request = axios.create({
-    baseURL: '/api',
+    baseURL: import.meta.env.VITE_API_PREFIX as string,
     timeout: 30000
 })
 
