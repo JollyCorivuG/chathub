@@ -9,7 +9,7 @@ public class SystemConstant {
     public static final String DEFAULT_NICK_NAME_PREFIX = "user_";
 
     // 默认用户头像
-    public static final String DEFAULT_USER_AVATAR_URL = "http://localhost:8081/upload/default_user_avatar.jpg";
+    public static final String DEFAULT_USER_AVATAR_URL = "http://localhost:8081/api/upload/default_user_avatar.jpg";
 
     // 查询用户的默认分页参数
     public static final Integer DEFAULT_PAGE_SIZE = 20;
