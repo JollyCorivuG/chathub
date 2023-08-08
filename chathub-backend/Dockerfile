@@ -1,4 +1,4 @@
-FROM adoptopenjdk:17-jdk-hotspot
+FROM openjdk:17-slim
 
 # 安装 Maven
 RUN apt-get update && apt-get install -y maven
