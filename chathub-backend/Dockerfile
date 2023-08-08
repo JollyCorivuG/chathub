@@ -1,4 +1,7 @@
-FROM maven:3.8.1-jdk-8-slim as builder
+FROM adoptopenjdk:17-jdk-hotspot
+
+# 安装 Maven
+RUN apt-get update && apt-get install -y maven
 
 # Copy local code to the container image.
 WORKDIR /app
