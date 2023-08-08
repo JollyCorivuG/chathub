@@ -9,7 +9,7 @@ public class SystemConstant {
     public static final String DEFAULT_NICK_NAME_PREFIX = "user_";
 
     // 默认用户头像
-    public static final String DEFAULT_USER_AVATAR_URL = "http://localhost:8081/api/upload/default_user_avatar.jpg";
+    public static final String DEFAULT_USER_AVATAR_URL = "http://8.130.127.207:9010/chathub/common/default_user_avatar.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=admin%2F20230808%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20230808T044839Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=2239b0cafa98324609a10ec7013495c0711106799385f4180b7238e016c74422";
 
     // 查询用户的默认分页参数
     public static final Integer DEFAULT_PAGE_SIZE = 20;

@@ -24,8 +24,8 @@ public class OssServiceImpl implements IOssService {
     @Resource
     private MinioProperties minioProperties;
 
-    // 获取文件的访问路径
-    private String getResignedObjectUrl(String bucketName, String objectName) throws Exception {
+    @Override
+    public String getResignedObjectUrl(String bucketName, String objectName) throws Exception {
         GetPresignedObjectUrlArgs args = GetPresignedObjectUrlArgs.builder()
                 .bucket(bucketName)
                 .object(objectName)

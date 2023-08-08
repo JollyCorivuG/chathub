@@ -7,7 +7,7 @@ CREATE TABLE `tb_user`  (
     `password` varchar(128) NULL DEFAULT '' COMMENT '密码，加密存储',
     `phone` varchar(11) NOT NULL COMMENT '手机号码',
     `nick_name` varchar(32) NULL DEFAULT '' COMMENT '昵称',
-    `avatar_url` varchar(255) NULL DEFAULT '' COMMENT '人物头像路径',
+    `avatar_url` VARCHAR(1024) NULL DEFAULT '' COMMENT '人物头像路径',
     `level` int NULL DEFAULT 1 COMMENT '人物等级',
     `friend_count` int NULL DEFAULT 0 COMMENT '好友数量',
     `group_count` int NULL DEFAULT 0 COMMENT '群组数量',

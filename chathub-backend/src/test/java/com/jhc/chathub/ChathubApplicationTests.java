@@ -7,6 +7,7 @@ import com.jhc.chathub.pojo.dto.message.MessageExtra;
 import com.jhc.chathub.pojo.entity.Message;
 import com.jhc.chathub.pojo.entity.User;
 import com.jhc.chathub.service.IMessageService;
+import com.jhc.chathub.service.IOssService;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -82,5 +83,12 @@ class ChathubApplicationTests {
 		Message message = messageService.getById(2);
 		System.out.println(message.getExtra().getImgMsg().getUrl());
 		System.out.println(message);
+	}
+
+	@Resource
+	private IOssService ossService;
+	@Test
+	void getDefaultAvatarUrl() throws Exception {
+		System.out.println(ossService.getResignedObjectUrl("chathub", "common/default_user_avatar.jpg"));
 	}
 }

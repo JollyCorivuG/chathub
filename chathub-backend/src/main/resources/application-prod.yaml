@@ -8,3 +8,8 @@ spring:
     redis:
       port: 6379
       host: 8.130.127.207
+minio:
+  endpoint: http://8.130.127.207:9010
+  accessKey: admin
+  secretKey: admin123456
+  bucketName: chathub
