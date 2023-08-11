@@ -38,4 +38,7 @@ public class SystemConstant {
     public static final Integer ROOM_TYPE_SINGLE = 0; // 单聊
     public static final Integer ROOM_TYPE_GROUP = 1; // 群聊
 
+    // 说说的额外内容的类型, 0表示图片, 1表示视频
+    public static final Integer TALK_EXTRA_TYPE_IMG = 0;
+    public static final Integer TALK_EXTRA_TYPE_VIDEO = 1;
 }

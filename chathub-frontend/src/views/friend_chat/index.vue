@@ -312,7 +312,7 @@ onMounted(async () => {
     for (let i = 0; i < suffixFileImgList.length; i++) {
         const img = suffixFileImgList[i] as HTMLImageElement
         img.onerror = () => {
-            img.src = '/src/assets/images/file/OTHER.png'
+            img.src = (import.meta as any).env.VITE_STATIC_ASSETS_PATH + 'images/file/OTHER.png'
         }
     }
 })

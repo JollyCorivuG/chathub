@@ -1,10 +1,15 @@
 package com.jhc.chathub;
 
 import com.jhc.chathub.common.constants.SystemConstant;
+import com.jhc.chathub.mapper.TalkMapper;
 import com.jhc.chathub.mapper.UserMapper;
 import com.jhc.chathub.pojo.dto.message.ImgMsgDTO;
 import com.jhc.chathub.pojo.dto.message.MessageExtra;
+import com.jhc.chathub.pojo.dto.talk.ImgDTO;
+import com.jhc.chathub.pojo.dto.talk.TalkExtra;
+import com.jhc.chathub.pojo.dto.talk.VideoDTO;
 import com.jhc.chathub.pojo.entity.Message;
+import com.jhc.chathub.pojo.entity.Talk;
 import com.jhc.chathub.pojo.entity.User;
 import com.jhc.chathub.service.IMessageService;
 import com.jhc.chathub.service.IOssService;
@@ -13,6 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @SpringBootTest
@@ -90,5 +97,34 @@ class ChathubApplicationTests {
 	@Test
 	void getDefaultAvatarUrl() throws Exception {
 		System.out.println(ossService.getResignedObjectUrl("chathub", "common/default_user_avatar.jpg"));
+	}
+
+	@Resource
+	private TalkMapper talkMapper;
+	@Test
+	void testInsertTalk() {
+		Talk talk = new Talk();
+		talk.setAuthorId(1L);
+		List<TalkExtra> extra = new ArrayList<>();
+		for (int i = 1; i <= 9; i++) {
+			if (i % 2 == 0) {
+				ImgDTO imgDTO = new ImgDTO();
+				imgDTO.setUrl("http://www.baidu.com");
+				extra.add(new TalkExtra().setType(SystemConstant.TALK_EXTRA_TYPE_IMG).setData(imgDTO));
+			} else {
+				VideoDTO videoDTO = new VideoDTO();
+				videoDTO.setUrl("http://www.baidu.com");
+				videoDTO.setCoverUrl("http://www.baidu.com");
+				extra.add(new TalkExtra().setType(SystemConstant.TALK_EXTRA_TYPE_VIDEO).setData(videoDTO));
+			}
+		}
+		talk.setExtra(extra);
+		talkMapper.insert(talk);
+	}
+
+	@Test
+	void queryTalk() {
+		Talk talk = talkMapper.selectById(2);
+		System.out.println(talk);
 	}
 }

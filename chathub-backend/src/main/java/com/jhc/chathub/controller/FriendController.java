@@ -11,9 +11,9 @@ import com.jhc.chathub.utils.UserHolder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -22,9 +22,6 @@ import java.util.List;
 public class FriendController {
     @Resource
     private IFriendService friendService;
-
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
 
     @Resource
     private IUserService userService;
@@ -49,6 +46,9 @@ public class FriendController {
     public Response<List<UserVO>> getFriendList() {
         Long selfId = UserHolder.getUser().getId();
         List<Long> friendsId = userService.queryFriendIds(selfId);
+        if (friendsId.isEmpty()) {
+            return Response.success(Collections.emptyList());
+        }
         List<UserVO> userVOList = userMapper.selectBatchIds(friendsId).stream()
                 .map(user -> userService.convertUserToUserVO(selfId, user))
                 .sorted((o1, o2) -> {

@@ -2,9 +2,9 @@ package com.jhc.chathub.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jhc.chathub.pojo.entity.Room;
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.Mapper;
 
-@Repository
+@Mapper
 public interface RoomMapper extends BaseMapper<Room> {
 
 }

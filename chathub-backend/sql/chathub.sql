@@ -66,3 +66,40 @@ CREATE TABLE `tb_room`  (
        PRIMARY KEY (`id`) USING BTREE
 );
 
+DROP TABLE IF EXISTS `tb_feeds`;
+CREATE TABLE `tb_feeds`  (
+     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+     `talk_id` bigint(20) NOT NULL COMMENT '说说的id',
+     `connect_user_id` bigint(20) NOT NULL COMMENT '需要推送给的用户id',
+     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+     PRIMARY KEY (`id`) USING BTREE,
+     INDEX `idx_connect_uid`(`connect_user_id`) USING BTREE
+);
+
+DROP TABLE IF EXISTS `tb_talk`;
+CREATE TABLE `tb_talk`  (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `author_id` bigint(20) NOT NULL COMMENT '发布者id',
+    `content` VARCHAR(1024) NULL DEFAULT '' COMMENT '文案内容',
+    `extra` json NULL COMMENT '说说的额外内容，是一个json列表，可以是图片，视频',
+    `like_count` int NOT NULL DEFAULT 0 COMMENT '点赞数',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `idx_author_uid`(`author_id`) USING BTREE
+);
+
+DROP TABLE IF EXISTS `tb_comment`;
+CREATE TABLE `tb_comment`  (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `sender_id` bigint(20) NOT NULL COMMENT '发送者id',
+    `talk_id` bigint(20) NOT NULL COMMENT '说说id',
+    `content` VARCHAR(300) NOT NULL COMMENT '评论内容',
+    `father_comment_id` bigint(20) NULL DEFAULT 0 COMMENT '回复的评论id',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `idx_talk_uid`(`talk_id`) USING BTREE
+);
+

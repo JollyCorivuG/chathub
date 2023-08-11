@@ -5,3 +5,9 @@ declare module '*.vue' {
 }
 
 declare module 'nprogress';
+
+interface ImportMetaEnv {
+    VITE_API_PREFIX: string,
+    VITE_WS_URL: string,
+    VITE_STATIC_ASSETS_PATH: string
+}
