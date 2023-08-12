@@ -1,5 +1,7 @@
 package com.jhc.chathub.controller;
 
+import com.jhc.chathub.common.request.CursorPageBaseReq;
+import com.jhc.chathub.common.resp.CursorPageBaseResp;
 import com.jhc.chathub.common.resp.Response;
 import com.jhc.chathub.pojo.dto.talk.CreateTalkDTO;
 import com.jhc.chathub.pojo.vo.TalkVO;
@@ -8,10 +10,7 @@ import com.jhc.chathub.utils.UserHolder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @Author: <a href="https://github.com/JollyCorivuG">JollyCorivuG</a>
@@ -30,4 +29,13 @@ public class TrendController {
         Long userId = UserHolder.getUser().getId();
         return Response.success(trendService.createTalk(userId, talk));
     }
+
+    @GetMapping("/talk/list")
+    @Operation(summary = "分页获取说说列表")
+    public Response<CursorPageBaseResp<TalkVO>> getTalkList(CursorPageBaseReq req) {
+        Long userId = UserHolder.getUser().getId();
+        return Response.success(trendService.getTalkPage(userId, req));
+    }
+
+
 }

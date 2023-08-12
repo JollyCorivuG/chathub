@@ -6,8 +6,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jhc.chathub.bizmq.feeds.FeedsMessage;
 import com.jhc.chathub.bizmq.feeds.FeedsMessageProducer;
 import com.jhc.chathub.common.constants.RedisConstant;
+import com.jhc.chathub.common.request.CursorPageBaseReq;
+import com.jhc.chathub.common.resp.CursorPageBaseResp;
 import com.jhc.chathub.mapper.TalkMapper;
 import com.jhc.chathub.pojo.dto.talk.CreateTalkDTO;
+import com.jhc.chathub.pojo.entity.Feeds;
 import com.jhc.chathub.pojo.entity.Talk;
 import com.jhc.chathub.pojo.vo.CommentVO;
 import com.jhc.chathub.pojo.vo.TalkVO;
@@ -15,6 +18,7 @@ import com.jhc.chathub.pojo.vo.UserVO;
 import com.jhc.chathub.service.ICommentService;
 import com.jhc.chathub.service.ITrendService;
 import com.jhc.chathub.service.IUserService;
+import com.jhc.chathub.utils.CursorUtils;
 import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -39,6 +43,9 @@ public class TrendServiceImpl extends ServiceImpl<TalkMapper, Talk> implements I
 
     @Resource
     private FeedsMessageProducer feedsMessageProducer;
+
+    @Resource
+    private FeedsServiceImpl feedsService;
 
     @Override
     public TalkVO convertTalkToVO(Talk talk) {
@@ -74,12 +81,31 @@ public class TrendServiceImpl extends ServiceImpl<TalkMapper, Talk> implements I
                 .setExtra(talk.getExtra());
         save(saveTalk);
 
-        // 2.采用推模式将说说发布这一事件推送到消息队列, 由消息队列异步处理, 将feeds流推送给好友
+        // 2.保存自己的feeds到数据库
+        Feeds feeds = new Feeds();
+        feeds.setConnectUserId(userId)
+                .setTalkId(saveTalk.getId());
+        feedsService.save(feeds);
+
+        // 3.采用推模式将说说发布这一事件推送到消息队列, 由消息队列异步处理, 将feeds流推送给好友
         FeedsMessage feedsMessage = new FeedsMessage();
         feedsMessage.setAuthorId(userId).setTalkId(saveTalk.getId());
         feedsMessageProducer.sendMessage(JSONUtil.toJsonStr(feedsMessage));
 
         // 3.将说说转换为VO返回
         return convertTalkToVO(getById(saveTalk.getId()));
+    }
+
+    @Override
+    public CursorPageBaseResp<TalkVO> getTalkPage(Long userId, CursorPageBaseReq req) {
+        // 1.先根据userId查询出来Feeds
+        CursorPageBaseResp<Feeds> feedsPage = CursorUtils.getCursorPageByMysql(feedsService, req, wrapper -> wrapper.eq(Feeds::getConnectUserId, userId), Feeds::getId);
+        if (feedsPage.isEmpty()) {
+            return CursorPageBaseResp.empty();
+        }
+
+        // 2.再根据Feeds中的talkId查询出来talk
+        return CursorPageBaseResp.change(feedsPage,
+                query().in("id", feedsPage.getList().stream().map(Feeds::getTalkId).toList()).list().stream().map(this::convertTalkToVO).toList());
     }
 }

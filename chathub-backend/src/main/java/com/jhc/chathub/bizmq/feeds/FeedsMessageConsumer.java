@@ -35,7 +35,7 @@ public class FeedsMessageConsumer {
         try {
             // 1.将message转换为FeedsMessage对象
             FeedsMessage feedsMsg = JSONUtil.toBean(message, FeedsMessage.class);
-            if (feedsMsg == null || feedsMsg.getAuthorId() == null || feedsMsg.getTalkId() == null) {
+            if (!FeedsMessage.isValid(feedsMsg)) {
                 log.error("收到的消息格式不正确");
                 channel.basicAck(deliveryTag, false);
                 return;
