@@ -13,6 +13,7 @@ import com.jhc.chathub.pojo.entity.Talk;
 import com.jhc.chathub.pojo.entity.User;
 import com.jhc.chathub.service.IMessageService;
 import com.jhc.chathub.service.IOssService;
+import com.jhc.chathub.service.ITrendService;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -122,9 +123,11 @@ class ChathubApplicationTests {
 		talkMapper.insert(talk);
 	}
 
+	@Resource
+	private ITrendService trendService;
 	@Test
 	void queryTalk() {
-		Talk talk = talkMapper.selectById(2);
-		System.out.println(talk);
+		Talk talk = talkMapper.selectById(6);
+		System.out.println(trendService.convertTalkToVO(talk));
 	}
 }

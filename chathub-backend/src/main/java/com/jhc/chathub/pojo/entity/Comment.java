@@ -21,7 +21,7 @@ public class Comment {
     private Long senderId;
     private Long talkId;
     private String content;
-    private Long fatherCommentId;
+    private Long replyUserId;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 }

@@ -27,6 +27,11 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
 mybatis-plus:
   type-aliases-package: com.jhc.chathub.pojo.entity
 #  configuration:
