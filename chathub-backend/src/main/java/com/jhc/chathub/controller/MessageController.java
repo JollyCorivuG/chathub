@@ -39,7 +39,8 @@ public class MessageController {
     @GetMapping("/room")
     @Operation(summary = "获取房间列表")
     public Response<List<RoomVO>> getRoomList() {
-        List<RoomVO> roomList = messageService.getRoomList();
+        Long userId = UserHolder.getUser().getId();
+        List<RoomVO> roomList = messageService.getRoomList(userId);
         return Response.success(roomList);
     }
 

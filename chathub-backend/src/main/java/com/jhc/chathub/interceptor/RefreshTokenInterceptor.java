@@ -24,8 +24,11 @@ public class RefreshTokenInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
-        // 1.获取请求头中的token
+        // 1.获取请求头中的token或者url中的token
         String token = request.getHeader("token");
+        if (StrUtil.isBlank(token)) {
+            token = request.getParameter("token");
+        }
         if (StrUtil.isBlank(token)) {
             return true;
         }

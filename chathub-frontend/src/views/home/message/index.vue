@@ -95,15 +95,32 @@ const deleteRoom = async (roomId: number) => {
     roomList.value = roomList.value.filter(room => room.id != roomId)
 }
 
-// 当页面渲染完毕后，开启定时器，每隔一段时间刷新一次会话列表
+// 当页面渲染完毕后，建立sse连接
 onMounted(() => {
-    const polling = setInterval(() => {
-        getRoomList()
-    }, 2000)
-    // 当页面销毁时，清除定时器
-    onBeforeUnmount(() => {
-        clearInterval(polling)
+    // 1.利用EventSource对象，建立与服务器的连接, 我需要让请求头带上token并支持跨域
+    const token: string = localStorage.getItem('token') as string || ''
+    const eventSource = new EventSource(import.meta.env.VITE_API_PREFIX + '/sse/subscribe?' + 'token=' + token, {
+        withCredentials: true
     })
+    // 2.监听服务器端的消息
+    eventSource.onmessage = (event) => {
+        roomList.value = JSON.parse(event.data)
+        getUnreadMsgCount()
+    }
+
+    // 当页面销毁时
+    onBeforeUnmount(() => {
+        // clearInterval(polling)
+        // 关闭sse连接, 向服务器发送一个关闭连接的请求, /sse/close
+        fetch(import.meta.env.VITE_API_PREFIX + '/sse/close', {
+            method: 'GET',
+            headers: {
+                'token': localStorage.getItem('token') || ''
+            }
+        })
+        eventSource.close()
+    })
+
 })
 </script>
 

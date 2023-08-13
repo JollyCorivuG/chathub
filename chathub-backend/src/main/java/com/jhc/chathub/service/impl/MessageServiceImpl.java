@@ -166,9 +166,8 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     }
 
     @Override
-    public List<RoomVO> getRoomList() {
+    public List<RoomVO> getRoomList(Long userId) {
         // 1.先得到用户的好友id和群组id
-        Long userId = UserHolder.getUser().getId();
         List<Long> friendIds = userService.queryFriendIds(userId);
         List<Long> groupIds = userService.queryGroupIds(userId);
         List<RoomVO> friendRooms = getFriendRooms(userId, friendIds);
