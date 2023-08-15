@@ -99,13 +99,13 @@ public class TrendServiceImpl extends ServiceImpl<TalkMapper, Talk> implements I
     @Override
     public CursorPageBaseResp<TalkVO> getTalkPage(Long userId, CursorPageBaseReq req) {
         // 1.先根据userId查询出来Feeds
-        CursorPageBaseResp<Feeds> feedsPage = CursorUtils.getCursorPageByMysql(feedsService, req, wrapper -> wrapper.eq(Feeds::getConnectUserId, userId), Feeds::getId);
+        CursorPageBaseResp<Feeds> feedsPage = CursorUtils.getCursorPageByMysql(feedsService, req, wrapper -> wrapper.eq(Feeds::getConnectUserId, userId), Feeds::getTalkId);
         if (feedsPage.isEmpty()) {
             return CursorPageBaseResp.empty();
         }
 
-        // 2.再根据Feeds中的talkId查询出来talk
+        // 2.再根据Feeds中的talkId查询出来talk并按照Feeds中的顺序排序
         return CursorPageBaseResp.change(feedsPage,
-                query().in("id", feedsPage.getList().stream().map(Feeds::getTalkId).toList()).list().stream().map(this::convertTalkToVO).toList());
+                query().in("id", feedsPage.getList().stream().map(Feeds::getTalkId).toList()).orderByDesc("id").list().stream().map(this::convertTalkToVO).toList());
     }
 }

@@ -42,7 +42,7 @@ public class OssServiceImpl implements IOssService {
         // 2.得到上传目录以及随机文件名
         String uploadDir = userId + "/" + date;
         String fileName = FileUtils.generateRandomFileName() + "-" + file.getOriginalFilename();
-
+        
         // 3.上传文件
         try {
             minioClient.putObject(PutObjectArgs.builder()

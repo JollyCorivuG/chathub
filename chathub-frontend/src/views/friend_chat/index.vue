@@ -118,9 +118,9 @@ const addEmoji = (emoji: string) => {
 
 // 发送图片
 const sendImgList = ref<UploaderFileListItem[]>([] as UploaderFileListItem[])
-const mxImgSize = ref<number>(1024 * 1024)
+const mxImgSize = ref<number>(1024 * 1024 * 5)
 const overMxImgSize = () => {
-    showNotify({type: 'danger', message: '图片大小不能超过1MB！'})
+    showNotify({type: 'danger', message: '图片大小不能超过5MB！'})
 }
 const sendImg = async () => {
     if (sendImgList.value.length == 0) {

@@ -30,7 +30,7 @@ const route = useRoute()
 const actions = [
     { text: '创建群聊', icon: 'shield-o'},
     { text: '加好友/群', icon: 'contact'},
-    { text: '扫一扫', icon: 'scan'},
+    { text: '发布说说', icon: 'share-o'},
     {text: '退出登录', icon: 'revoke'}
 ];
 const onSelect = (item: any) => {
@@ -45,7 +45,10 @@ const onSelect = (item: any) => {
                 }
             })
             break
-        case '扫一扫':
+        case '发布说说':
+            router.push({
+                path: '/create_talk',
+            })
             break
         case '退出登录':
             doLogout()

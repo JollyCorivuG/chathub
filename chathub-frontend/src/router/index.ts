@@ -66,6 +66,10 @@ export default createRouter({
             component: () => import('@/views/group_chat/index.vue'),
         },
         {
+            path: '/create_talk',
+            component: () => import('@/views/create_talk/index.vue'),
+        },
+        {
             path: '/404',
             component: () => import('@/views/404/index.vue')
         }
