@@ -9,4 +9,9 @@ public class MqConstant {
     public static final String FEEDS_EXCHANGE = "feeds_exchange";
     public static final String FEEDS_QUEUE = "feeds_queue";
     public static final String FEEDS_ROUTING_KEY = "feeds_routing_key";
+
+    // 跟点赞相关消息队列的常量
+    public static final String LIKE_EXCHANGE = "like_exchange";
+    public static final String LIKE_QUEUE = "like_queue";
+    public static final String LIKE_ROUTING_KEY = "like_routing_key";
 }

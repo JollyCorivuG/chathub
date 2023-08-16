@@ -20,6 +20,7 @@ public class TalkVO {
     private String content;
     private List<TalkExtra> extra;
     private Integer likeCount;
+    private Boolean isLike;
     private List<UserVO> latestLikeUsers; // 最新点赞的用户, 最多显示5个
     private List<CommentVO> comments = Collections.emptyList();
     private LocalDateTime createTime;

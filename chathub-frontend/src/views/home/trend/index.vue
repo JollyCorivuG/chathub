@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <van-pull-refresh>
+        <van-pull-refresh v-model="refreshLoading" @refresh="onRefresh">
             <van-list v-model:loading="loading" :finished="isLast" @load="getTalkList">
                 <div v-for="(talk, index) in talkList" :key="index" class="talk-panel">
                     <div class="top">
@@ -22,7 +22,8 @@
                         <img v-for="(img, index1) in talk.extra" :key="index" :src="img.data.url" alt="photo" @click="previewImg(talk.extra, index1)" />
                     </div>
                     <div class="action">
-                        <van-icon name="like-o" color="#7F7F7F" size="24px" />
+                        <van-icon v-if="talk.isLike" name="like" color="#FF0000" size="24px" @click="doLike(talk, false)"/>
+                        <van-icon  v-else name="like-o" color="#7F7F7F" size="24px" @click="doLike(talk, true)" />
                         <van-icon name="comment-o" color="#7F7F7F" size="24px" style="margin-left: 10px" />
                         <van-icon name="share-o" color="#7F7F7F" size="24px" style="margin-left: 10px" />
                     </div>
@@ -56,12 +57,13 @@
 
 <script setup lang="ts">
 import {ref} from "vue";
-import {ExtraInfo, ShowTalkInfo, TalkListResponse} from "@/api/trend/type.ts";
-import {reqTalkList} from "@/api/trend";
+import {ExtraInfo, LikeParams, ShowTalkInfo, TalkListResponse} from "@/api/trend/type.ts";
+import {reqLike, reqTalkList} from "@/api/trend";
 import {showImagePreview, showNotify} from "vant";
 import {formatTime} from "@/utils/time_format.ts";
 import {getLikePeople} from "@/utils/talk.ts";
 import useUserStore from "@/pinia/modules/user";
+import {CommonResponse} from "@/api/user/type.ts";
 
 // 说说列表
 const talkList = ref<ShowTalkInfo[]>([])
@@ -78,6 +80,15 @@ const getTalkList = async () => {
     isLast.value = resp.data.isLast
     talkList.value = talkList.value.concat(resp.data.list)
     loading.value = false
+    refreshLoading.value = false
+}
+
+// 下拉刷新
+const refreshLoading = ref<boolean>(false)
+const onRefresh = async () => {
+    isLast.value = false
+    cursor.value = ''
+    talkList.value = []
 }
 
 // 预览图片
@@ -86,6 +97,30 @@ const previewImg = (urls: ExtraInfo[], index: number) => {
         images: urls.map(item => item.data.url),
         startPosition: index
     })
+}
+
+// 点赞
+const doLike = async (talk: ShowTalkInfo, isLike: boolean) => {
+    const likeParams: LikeParams = {
+        talkId: talk.id,
+        isLike: isLike
+    }
+    const resp: CommonResponse = await reqLike(likeParams)
+    if (resp.statusCode != 0) {
+        showNotify({type: 'danger', message: resp.statusMsg})
+    }
+    talk.isLike = isLike
+    if (isLike) {
+        talk.likeCount++
+        talk.latestLikeUsers.unshift(userStore.userInfo)
+    } else {
+        talk.likeCount--
+        // 如果是取消点赞，就删除最新点赞用户列表中的自己, 如果列表中没有自己，就不删除
+        const index = talk.latestLikeUsers.findIndex(item => item.id == userStore.userInfo.id)
+        if (index != -1) {
+            talk.latestLikeUsers.splice(index, 1)
+        }
+    }
 }
 
 // 评论

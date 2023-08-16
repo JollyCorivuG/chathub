@@ -15,6 +15,9 @@ export const getLikePeople = (latestLikeUsers: UserInfo[], totalNum: number): st
     if (totalNum > 5) {
         return likePeople.slice(0, 5) + '...' + '等' + totalNum + '人点赞'
     } else {
+        if (totalNum === 0) {
+            return ''
+        }
         return likePeople + '等' + totalNum + '人点赞'
     }
 }

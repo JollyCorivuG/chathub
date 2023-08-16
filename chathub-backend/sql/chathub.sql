@@ -103,3 +103,13 @@ CREATE TABLE `tb_comment`  (
     INDEX `idx_talk_uid`(`talk_id`) USING BTREE
 );
 
+DROP TABLE IF EXISTS `tb_like`;
+CREATE TABLE `tb_like`  (
+   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+   `talk_id` bigint(20) NOT NULL COMMENT '说说id',
+   `user_id` bigint(20) NULL DEFAULT 0 COMMENT '点赞的用户id',
+   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+   PRIMARY KEY (`id`) USING BTREE,
+   INDEX `idx_talk_uid`(`talk_id`) USING BTREE
+);

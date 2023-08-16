@@ -4,6 +4,7 @@ import com.jhc.chathub.common.request.CursorPageBaseReq;
 import com.jhc.chathub.common.resp.CursorPageBaseResp;
 import com.jhc.chathub.common.resp.Response;
 import com.jhc.chathub.pojo.dto.talk.CreateTalkDTO;
+import com.jhc.chathub.pojo.dto.talk.LikeInfoDTO;
 import com.jhc.chathub.pojo.vo.TalkVO;
 import com.jhc.chathub.service.ITrendService;
 import com.jhc.chathub.utils.UserHolder;
@@ -37,5 +38,15 @@ public class TrendController {
         return Response.success(trendService.getTalkPage(userId, req));
     }
 
-
+    @PostMapping("/talk/like")
+    @Operation(summary = "点赞或取消点赞")
+    public Response<Void> likeTalk(@RequestBody LikeInfoDTO likeInfo) {
+        Long userId = UserHolder.getUser().getId();
+        if (likeInfo.getIsLike()) {
+            trendService.likeTalk(userId, likeInfo.getTalkId());
+        } else {
+            trendService.cancelLikeTalk(userId, likeInfo.getTalkId());
+        }
+        return Response.success(null);
+    }
 }

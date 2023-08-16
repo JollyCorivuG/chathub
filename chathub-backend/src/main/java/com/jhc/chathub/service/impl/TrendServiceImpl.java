@@ -5,6 +5,8 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jhc.chathub.bizmq.feeds.FeedsMessage;
 import com.jhc.chathub.bizmq.feeds.FeedsMessageProducer;
+import com.jhc.chathub.bizmq.like.LikeMessage;
+import com.jhc.chathub.bizmq.like.LikeMessageProducer;
 import com.jhc.chathub.common.constants.RedisConstant;
 import com.jhc.chathub.common.request.CursorPageBaseReq;
 import com.jhc.chathub.common.resp.CursorPageBaseResp;
@@ -19,10 +21,12 @@ import com.jhc.chathub.service.ICommentService;
 import com.jhc.chathub.service.ITrendService;
 import com.jhc.chathub.service.IUserService;
 import com.jhc.chathub.utils.CursorUtils;
+import com.jhc.chathub.utils.UserHolder;
 import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -45,6 +49,9 @@ public class TrendServiceImpl extends ServiceImpl<TalkMapper, Talk> implements I
     private FeedsMessageProducer feedsMessageProducer;
 
     @Resource
+    private LikeMessageProducer likeMessageProducer;
+
+    @Resource
     private FeedsServiceImpl feedsService;
 
     @Override
@@ -56,19 +63,22 @@ public class TrendServiceImpl extends ServiceImpl<TalkMapper, Talk> implements I
         UserVO author = userService.convertUserToUserVO(talk.getAuthorId(), userService.getById(talk.getAuthorId()));
         talkVO.setAuthor(author);
 
-        // 3.查询最新点赞的五个用户
+        // 3.查询是否点赞
+        talkVO.setIsLike(stringRedisTemplate.opsForZSet().score(RedisConstant.TALK_LATEST_LIKE + talk.getId(), UserHolder.getUser().getId().toString()) != null);
+
+        // 4.查询最新点赞的五个用户
         List<Long> userIds = Objects.requireNonNull(stringRedisTemplate.opsForZSet()
                 .reverseRange(RedisConstant.TALK_LATEST_LIKE + talk.getId(), 0, 4))
                 .stream().map(Long::parseLong).toList();
         List<UserVO> latestLikeUsers = userIds.stream().map(id -> userService.convertUserToUserVO(id, userService.getById(id))).toList();
         talkVO.setLatestLikeUsers(latestLikeUsers);
 
-        // 4.查询评论
+        // 5.查询评论
         List<CommentVO> comments = commentService.query().eq("talk_id", talk.getId()).list()
                 .stream().map(commentService::convertCommentToVO).toList();
         talkVO.setComments(comments);
 
-        // 5.返回
+        // 6.返回
         return talkVO;
     }
 
@@ -107,5 +117,31 @@ public class TrendServiceImpl extends ServiceImpl<TalkMapper, Talk> implements I
         // 2.再根据Feeds中的talkId查询出来talk并按照Feeds中的顺序排序
         return CursorPageBaseResp.change(feedsPage,
                 query().in("id", feedsPage.getList().stream().map(Feeds::getTalkId).toList()).orderByDesc("id").list().stream().map(this::convertTalkToVO).toList());
+    }
+
+    @Override
+    public void likeTalk(Long userId, Long talkId) {
+        // 1.构建点赞信息
+        LikeMessage likeMsg = new LikeMessage();
+        likeMsg.setUserId(userId).setTalkId(talkId).setCreateTime(LocalDateTime.now()).setIsLike(true);
+
+        // 2.插入到redis中, 按照时间排序
+        stringRedisTemplate.opsForZSet().add(RedisConstant.TALK_LATEST_LIKE + talkId, userId.toString(), likeMsg.getCreateTime().toEpochSecond(java.time.ZoneOffset.UTC));
+
+        // 3.发送消息到消息队列
+        likeMessageProducer.sendMessage(JSONUtil.toJsonStr(likeMsg));
+    }
+
+    @Override
+    public void cancelLikeTalk(Long userId, Long talkId) {
+        // 1.构建点赞信息
+        LikeMessage likeMsg = new LikeMessage();
+        likeMsg.setUserId(userId).setTalkId(talkId).setCreateTime(LocalDateTime.now()).setIsLike(false);
+
+        // 2.从redis中删除
+        stringRedisTemplate.opsForZSet().remove(RedisConstant.TALK_LATEST_LIKE + talkId, userId.toString());
+
+        // 3.发送消息到消息队列
+        likeMessageProducer.sendMessage(JSONUtil.toJsonStr(likeMsg));
     }
 }

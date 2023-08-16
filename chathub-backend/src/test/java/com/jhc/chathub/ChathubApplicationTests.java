@@ -63,7 +63,7 @@ class ChathubApplicationTests {
 			user.setPassword("123456" + i);
 			user.setPhone("123456789" + i);
 			user.setNickName("虎哥" + i);
-			user.setAvatarUrl(SystemConstant.DEFAULT_USER_AVATAR_URL);
+			user.setAvatarUrl(SystemConstant.DEV_DEFAULT_USER_AVATAR_URL);
 			userMapper.insert(user);
 		}
 	}

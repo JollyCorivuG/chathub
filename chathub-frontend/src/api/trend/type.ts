@@ -35,8 +35,10 @@ export interface ShowTalkInfo {
     content: string;
     extra: ExtraInfo[];
     likeCount: number;
+    isLike: boolean;
     latestLikeUsers: UserInfo[];
     comments: ShowCommentInfo[];
+
     createTime: string;
 }
 
@@ -58,5 +60,11 @@ export interface TalkListResponse extends CommonResponse {
         cursor: string;
         isLast: boolean;
     }
+}
+
+// 点赞的请求参数
+export interface LikeParams {
+    talkId: number;
+    isLike: boolean;
 }
 

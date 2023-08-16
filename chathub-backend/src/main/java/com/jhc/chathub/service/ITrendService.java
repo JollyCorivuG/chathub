@@ -17,4 +17,8 @@ public interface ITrendService extends IService<Talk> {
     TalkVO createTalk(Long userId, CreateTalkDTO talk);
 
     CursorPageBaseResp<TalkVO> getTalkPage(Long userId, CursorPageBaseReq req);
+
+    void likeTalk(Long userId, Long talkId);
+
+    void cancelLikeTalk(Long userId, Long talkId);
 }

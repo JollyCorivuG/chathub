@@ -26,6 +26,7 @@ import com.jhc.chathub.utils.RegexUtils;
 import com.jhc.chathub.utils.UserHolder;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +42,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Resource
     private FriendRelationMapper friendRelationMapper;
+
+    @Resource
+    private Environment environment;
 
     private Response<String> releaseToken(User user) {
         // 1.生成token
@@ -127,7 +131,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         User user = new User();
         String encodePassword = PasswordEncoder.encode(registerForm.getPassword());
         String nickName = SystemConstant.DEFAULT_NICK_NAME_PREFIX + RandomUtil.randomString(6);
-        user.setAccount(registerForm.getAccount()).setPassword(encodePassword).setPhone(registerForm.getPhone()).setNickName(nickName).setAvatarUrl(SystemConstant.DEFAULT_USER_AVATAR_URL);
+        user.setAccount(registerForm.getAccount()).setPassword(encodePassword).setPhone(registerForm.getPhone()).setNickName(nickName);
+        String defaultAvatarUrl = Objects.equals(environment.getProperty("spring.profiles.active"), "dev") ?
+                SystemConstant.DEV_DEFAULT_USER_AVATAR_URL : SystemConstant.PROD_DEFAULT_USER_AVATAR_URL;
+        user.setAvatarUrl(defaultAvatarUrl);
         save(user);
 
         // 3.颁发token并返回数据

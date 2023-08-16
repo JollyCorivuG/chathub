@@ -31,4 +31,5 @@ public class RedisConstant {
 
     // 记录某个说说最新点赞的用户id, key为说说id
     public static final String TALK_LATEST_LIKE = "talk:latest:like:";
+
 }
