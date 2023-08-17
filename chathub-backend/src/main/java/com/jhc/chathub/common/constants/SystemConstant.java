@@ -10,7 +10,7 @@ public class SystemConstant {
 
     // 默认用户头像
     public static final String DEV_DEFAULT_USER_AVATAR_URL = "/src/assets/images/avatar/default_user_avatar.jpg";
-    public static final String PROD_DEFAULT_USER_AVATAR_URL = "/usr/share/nginx/html//assets/images/avatar/default_user_avatar.jpg";
+    public static final String PROD_DEFAULT_USER_AVATAR_URL = "/assets/images/avatar/default_user_avatar.jpg";
 
     // 查询用户的默认分页参数
     public static final Integer DEFAULT_PAGE_SIZE = 20;

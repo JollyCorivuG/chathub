@@ -8,6 +8,11 @@ spring:
     redis:
       port: 6379
       host: 8.130.127.207
+  rabbitmq:
+    host: 8.130.127.207
+    port: 5672
+    username: guest
+    password: guest
 minio:
   endpoint: http://8.130.127.207:9010
   accessKey: admin
