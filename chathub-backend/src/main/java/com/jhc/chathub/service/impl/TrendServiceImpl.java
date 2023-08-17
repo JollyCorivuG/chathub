@@ -74,7 +74,7 @@ public class TrendServiceImpl extends ServiceImpl<TalkMapper, Talk> implements I
         talkVO.setLatestLikeUsers(latestLikeUsers);
 
         // 5.查询评论
-        List<CommentVO> comments = commentService.query().eq("talk_id", talk.getId()).list()
+        List<CommentVO> comments = commentService.query().eq("talk_id", talk.getId()).orderByAsc("id").list()
                 .stream().map(commentService::convertCommentToVO).toList();
         talkVO.setComments(comments);
 
