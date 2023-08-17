@@ -2,7 +2,7 @@
 
 >聊天中心项目：仿照qq移动端的UI页面，实现了qq相关的核心功能！
 >
->前后端全栈项目 By [JollyCorivuG]([JollyCorivuG (JIANG Haocheng) (github.com)](https://github.com/JollyCorivuG))
+>前后端全栈项目 By https://github.com/JollyCorivuG
 
 在线预览：[chathub.love](http://www.chathub.love/)
 
