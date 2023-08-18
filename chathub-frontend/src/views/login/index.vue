@@ -66,6 +66,7 @@
             </div>
         </div>
     </div>
+    <a href="https://beian.miit.gov.cn" target="_blank" class="beian">京ICP备2023021003号</a>
 </template>
 
 <script setup lang="ts">
@@ -246,5 +247,13 @@ const goRegisterPage = () => {
 
         }
     }
+}
+.beian {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #7f7f7f;
+
 }
 </style>
