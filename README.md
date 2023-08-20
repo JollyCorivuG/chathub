@@ -29,16 +29,19 @@
 ### 前端
 - vue3 + ts
 - Vant4 UI
-- axios请求库
-- pinia状态管理
+- axios 请求库
+- pinia 状态管理
+- pinia 持久化插件
+- Vue Router 路由管理
 
 ### 后端
-- JDK17 + Spring Boot框架（spring boot3.1）
-- Spring MVC + Mybatis Plus框架
+- JDK17 + Spring Boot 框架（spring boot3.1）
+- Spring MVC + Mybatis Plus 框架
 - Knife4j + Swagger 生成接口文档
 - mysql8.x (数据存储) + redis（缓存）
 - Netty + Websocket 实现即时通讯
 - SSE 实现消息列表实时刷新
 - RabbitMQ 消息队列
 - MinIO 实现文件存储
+- redis 实现分布式session
 
