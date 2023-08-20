@@ -1,7 +1,7 @@
 <template>
     <div class="top_tab">
         <div class="left">
-            <img :src="userStore.userInfo.avatarUrl" alt="user-avatar"/>
+            <img :src="userStore.userInfo.avatarUrl" alt="user-avatar" @click="goInfoPage"/>
             <span>{{userStore.userInfo.nickName}}</span>
         </div>
         <div class="right">
@@ -66,6 +66,13 @@ const doLogout = async () => {
         }
     })
     showNotify({type: 'primary', message: '登出成功!'})
+}
+
+// 去到个人主页
+const goInfoPage = () => {
+    router.push({
+        path: '/info'
+    })
 }
 </script>
 

@@ -3,9 +3,15 @@
         <div class="register-panel">
             <div class="header">
                 <div class="logo">
-
+                    <van-image
+                        width="45"
+                        height="45"
+                        fit="cover"
+                        src="/logo.png"
+                        round
+                    />
                 </div>
-                <div class="title">Chat Hub</div>
+                <div class="title">ChatHub</div>
             </div>
             <div class="register-form">
                 <van-form>
@@ -124,6 +130,9 @@ const goLoginPage = () => {
         .header {
             display: flex;
             align-items: center;
+            .logo {
+                margin-right: 10px;
+            }
             .title {
                 color: black;
                 font-weight: bold;
@@ -131,7 +140,7 @@ const goLoginPage = () => {
             }
         }
         .register-form {
-            margin-top: 20px;
+            margin-top: 10px;
         }
         .operator {
             width: 100%;

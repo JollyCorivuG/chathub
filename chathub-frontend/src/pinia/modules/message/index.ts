@@ -13,7 +13,6 @@ const useMsgStore = defineStore('Msg', {
             isLastPage: false,
             cursor: '',
             isReceiveMsg: false,
-            unReadMsgCount: 0
         }
     },
     getters: {

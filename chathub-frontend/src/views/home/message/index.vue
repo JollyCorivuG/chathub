@@ -1,7 +1,7 @@
 <template>
     <van-search placeholder="请输入搜索关键词" />
     <van-pull-refresh v-model="loading" @refresh="onRefresh" class="container">
-        <van-swipe-cell v-for="(room, index) in roomList" :key="index">
+        <van-swipe-cell v-for="(room, index) in roomStore.roomList" :key="index">
             <div class="room" @click="goChat(room)">
                 <img :src="room.connectInfo.avatarUrl" alt="avatar" class="left">
                 <div class="middle">
@@ -36,34 +36,24 @@
 
 <script setup lang="ts">
 // 获取会话列表
-import {onBeforeUnmount, onMounted, ref} from "vue";
-import type {CommonResponse, Room, RoomList, RoomListResponse} from "@/api/message/type.ts";
-import {reqDeleteRoom, reqRoomList} from "@/api/message";
+import {ref} from "vue";
+import type {CommonResponse, Room} from "@/api/message/type.ts";
+import {reqDeleteRoom} from "@/api/message";
 import {showNotify} from "vant";
 import {MsgType} from "@/api/message/type.ts";
 import {formatTime} from "@/utils/time_format.ts";
 import {useRouter} from "vue-router";
-import useMsgStore from "@/pinia/modules/message";
+import useRoomStore from "@/pinia/modules/room";
 
 // 会话列表
-const roomList = ref<RoomList>([]);
-const getRoomList = async () => {
-    const resp: RoomListResponse = await reqRoomList()
-    if (resp.statusCode != 0) {
-        showNotify({type: 'danger', message: resp.statusMsg})
-        return
-    }
-    roomList.value = resp.data
-    getUnreadMsgCount()
-}
-getRoomList()
+const roomStore = useRoomStore()
+roomStore.getRoomList()
 
 // 下拉刷新会话列表
 const loading = ref<boolean>(false)
 const onRefresh = async () => {
-    await getRoomList()
+    await roomStore.getRoomList()
     loading.value = false
-    getUnreadMsgCount()
 }
 
 // 跳转到聊天页面
@@ -76,15 +66,6 @@ const goChat = (room: Room) => {
     }
 }
 
-// 得到未读消息数量
-const msgStore = useMsgStore()
-const getUnreadMsgCount = () => {
-    msgStore.unReadMsgCount = 0
-    for (let i = 0; i < roomList.value.length; i++) {
-        msgStore.unReadMsgCount += roomList.value[i].unreadCount
-    }
-}
-
 // 删除会话
 const deleteRoom = async (roomId: number) => {
     const resp: CommonResponse = await reqDeleteRoom(roomId)
@@ -92,36 +73,9 @@ const deleteRoom = async (roomId: number) => {
         showNotify({type: 'danger', message: resp.statusMsg})
         return
     }
-    roomList.value = roomList.value.filter(room => room.id != roomId)
+    roomStore.roomList = roomStore.roomList.filter(room => room.id != roomId)
+    roomStore.getUnreadMsgCount()
 }
-
-// 当页面渲染完毕后，建立sse连接
-onMounted(() => {
-    // 1.利用EventSource对象，建立与服务器的连接, 我需要让请求头带上token并支持跨域
-    const token: string = localStorage.getItem('token') as string || ''
-    const eventSource = new EventSource(import.meta.env.VITE_API_PREFIX + '/sse/subscribe?' + 'token=' + token, {
-        withCredentials: true
-    })
-    // 2.监听服务器端的消息
-    eventSource.onmessage = (event) => {
-        roomList.value = JSON.parse(event.data)
-        getUnreadMsgCount()
-    }
-
-    // 当页面销毁时
-    onBeforeUnmount(() => {
-        // clearInterval(polling)
-        // 关闭sse连接, 向服务器发送一个关闭连接的请求, /sse/close
-        fetch(import.meta.env.VITE_API_PREFIX + '/sse/close', {
-            method: 'GET',
-            headers: {
-                'token': localStorage.getItem('token') || ''
-            }
-        })
-        eventSource.close()
-    })
-
-})
 </script>
 
 <style scoped lang="scss">

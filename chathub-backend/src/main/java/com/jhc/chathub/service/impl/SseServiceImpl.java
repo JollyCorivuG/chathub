@@ -1,10 +1,15 @@
 package com.jhc.chathub.service.impl;
 
+import com.jhc.chathub.pojo.vo.ForceLogoutInfo;
 import com.jhc.chathub.service.ISseService;
+import com.jhc.chathub.sse.SseRespType;
+import com.jhc.chathub.sse.SseResponse;
 import com.jhc.chathub.sse.SseSessionManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.time.LocalDateTime;
 
 /**
  * @Author: <a href="https://github.com/JollyCorivuG">JollyCorivuG</a>
@@ -34,11 +39,14 @@ public class SseServiceImpl implements ISseService {
     public SseEmitter connect(Long userId) {
         // 1.先判断是否已经存在
         if (SseSessionManager.isExist(userId)) {
+            // 1.1如果已经存在, 则发布一个强制下线的消息
+            send(userId, SseResponse.build(SseRespType.FORCE_LOGOUT.getCode(), ForceLogoutInfo.builder().time(LocalDateTime.now()).build()));
             SseSessionManager.remove(userId);
         }
 
         // 2.创建SseEmitter并加入到SseSessionManager中
         SseEmitter sseEmitter = newSseEmitter(userId);
+        log.info("type: SseSession Add, session Id : {}", userId);;
         SseSessionManager.add(userId, sseEmitter);
 
         // 3.返回SseEmitter

@@ -5,6 +5,5 @@ export interface MsgState {
     roomId: number
     isLastPage: boolean,
     cursor: string,
-    isReceiveMsg: boolean,
-    unReadMsgCount: number
+    isReceiveMsg: boolean
 }

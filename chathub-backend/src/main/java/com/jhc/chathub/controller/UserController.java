@@ -60,6 +60,14 @@ public class UserController {
         return userService.getUserInfo(selfId, selfId);
     }
 
+    @PutMapping("/info/me")
+    @Operation(summary = "更新当前登录用户信息")
+    public Response<UserVO> updateSelfInfo(@RequestBody UserVO userVO) {
+        Long selfId = UserHolder.getUser().getId();
+        return userService.updateUserInfo(selfId, userVO);
+    }
+
+
     @GetMapping("/info/{userId}")
     @Operation(summary = "根据id获取用户信息")
     public Response<UserVO> getUserInfoById(@PathVariable("userId") Long userId) {
@@ -73,6 +81,7 @@ public class UserController {
         Long selfId = UserHolder.getUser().getId();
         String token = stringRedisTemplate.opsForValue().get(RedisConstant.ID_TO_TOKEN + selfId);
         if (token != null) {
+            stringRedisTemplate.delete(RedisConstant.USER_TOKEN_KEY + token);
             stringRedisTemplate.opsForSet().remove(RedisConstant.ONLINE_USER_KEY, token);
         }
         stringRedisTemplate.delete(RedisConstant.ID_TO_TOKEN + selfId);

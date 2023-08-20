@@ -39,7 +39,7 @@
                 <img :src="userStore.userInfo.avatarUrl" alt="user-avatar" class="user-avatar">
             </div>
             <div v-else class="left">
-                <img :src="userStore.userInfo.avatarUrl" alt="user-avatar" class="user-avatar">
+                <img :src="friendInfo.avatarUrl" alt="user-avatar" class="user-avatar">
                 <div>
                     <div v-if="msg.message.msgType == MsgType.TEXT" class="message">
                         {{msg.message.body.content}}
@@ -101,6 +101,7 @@ import {buildWSUrl} from "@/utils/websocket/build_url.ts";
 import useUserStore from "@/pinia/modules/user";
 import {formatTime, isSameMinute} from "@/utils/time_format.ts";
 import {calcMB, generateFileIcon} from "@/utils/file.ts";
+import useSseStore from "@/pinia/modules/sse";
 
 // 返回上一页
 const router = useRouter()
@@ -300,7 +301,10 @@ const ws: WS = new WS(buildWSUrl(userStore.token, msgStore.roomId))
 
 // 让页面渲染完成后, 滚动到底部
 const messagePanel = ref<HTMLElement>()
+const sseStore = useSseStore()
 onMounted(async () => {
+    // 移除sse连接
+    sseStore.removeSseConnection()
     msgStore.initData()
     await getMsgList()
     if (messagePanel.value) {

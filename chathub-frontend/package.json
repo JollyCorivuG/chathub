@@ -12,6 +12,7 @@
         "axios": "^1.4.0",
         "nprogress": "^0.2.0",
         "pinia": "^2.1.4",
+        "pinia-plugin-persistedstate": "^3.2.0",
         "pinyin": "^3.0.0-alpha.5",
         "sass": "^1.64.0",
         "vant": "^4.6.2",

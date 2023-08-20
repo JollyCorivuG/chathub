@@ -70,6 +70,14 @@ export default createRouter({
             component: () => import('@/views/create_talk/index.vue'),
         },
         {
+            path: '/info',
+            component: () => import('@/views/info/index.vue'),
+        },
+        {
+            path: '/change_info',
+            component: () => import('@/views/change_info/index.vue'),
+        },
+        {
             path: '/404',
             component: () => import('@/views/404/index.vue')
         }

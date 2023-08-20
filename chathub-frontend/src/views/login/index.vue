@@ -3,9 +3,15 @@
         <div class="login-panel">
             <div class="header">
                 <div class="logo">
-
+                    <van-image
+                        width="45"
+                        height="45"
+                        fit="cover"
+                        src="/logo.png"
+                        round
+                    />
                 </div>
-                <div class="title">Chat Hub</div>
+                <div class="title">ChatHub</div>
             </div>
             <div v-if="loginType == 0" class="form">
                 <van-form>
@@ -204,6 +210,10 @@ const goRegisterPage = () => {
         .header {
             display: flex;
             align-items: center;
+            justify-content: center;
+            .logo {
+                margin-right: 10px;
+            }
             .title {
                 color: black;
                 font-weight: bold;
@@ -211,7 +221,7 @@ const goRegisterPage = () => {
             }
         }
         .form {
-            margin-top: 20px;
+            margin-top: 10px;
         }
         .phoneLoginForm {
             margin-top: 20px;

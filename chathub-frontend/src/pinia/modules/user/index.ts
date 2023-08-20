@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import {reqGetSelfInfo, reqLogin, reqLoginByPhone, reqLogout, reqRegister} from '@/api/user'
+import {reqGetSelfInfo, reqLogin, reqLoginByPhone, reqLogout, reqRegister, reqUpdateUserInfo} from '@/api/user'
 import {
     CommonResponse, GetUserInfoResponse,
     LoginByPhoneParams,
@@ -9,6 +9,7 @@ import {
     RegisterResponse, UserInfo
 } from "@/api/user/type.ts";
 import {UserState} from "@/pinia/modules/user/type.ts";
+import useSseStore from "@/pinia/modules/sse";
 
 const useUserStore = defineStore('User', {
     state: (): UserState => {
@@ -55,8 +56,16 @@ const useUserStore = defineStore('User', {
             return resp as CommonResponse
         },
         async logout(): Promise<CommonResponse> {
+            const sseStore = useSseStore()
+            sseStore.removeSseConnection()
             const resp: CommonResponse = await reqLogout()
             localStorage.clear()
+            return resp as CommonResponse
+        },
+        async updateUserInfo(userInfo: UserInfo): Promise<CommonResponse> {
+            const resp: GetUserInfoResponse = await reqUpdateUserInfo(userInfo)
+            localStorage.setItem('userInfo', JSON.stringify(resp.data))
+            this.userInfo = resp.data
             return resp as CommonResponse
         }
     }

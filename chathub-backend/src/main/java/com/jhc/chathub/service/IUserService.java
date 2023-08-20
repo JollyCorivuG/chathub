@@ -31,4 +31,6 @@ public interface IUserService extends IService<User> {
     List<Long> queryFriendIds(Long userId);
 
     List<Long> queryGroupIds(Long userId);
+
+    Response<UserVO> updateUserInfo(Long selfId, UserVO userVO);
 }

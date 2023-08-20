@@ -59,6 +59,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         stringRedisTemplate.expire(userTokenKey, RedisConstant.USER_TOKEN_KEY_TTL, TimeUnit.MINUTES);
 
         // 3.记录在线用户
+        String originToken = stringRedisTemplate.opsForValue().get(RedisConstant.ID_TO_TOKEN + user.getId());
+        if (originToken != null) {
+            stringRedisTemplate.delete(RedisConstant.USER_TOKEN_KEY + originToken);
+            stringRedisTemplate.opsForSet().remove(RedisConstant.ONLINE_USER_KEY, originToken);
+        }
         stringRedisTemplate.opsForValue().set(RedisConstant.ID_TO_TOKEN + user.getId(), token);
         stringRedisTemplate.opsForSet().add(RedisConstant.ONLINE_USER_KEY, token);
 
@@ -246,5 +251,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public List<Long> queryGroupIds(Long userId) {
         // TODO
         return Collections.emptyList();
+    }
+
+    @Override
+    public Response<UserVO> updateUserInfo(Long selfId, UserVO userVO) {
+        // 1.根据id查询用户
+        User user = getById(selfId);
+        if (user == null) {
+            return Response.fail("用户不存在!");
+        }
+
+        // 2.更新用户信息
+        user.setNickName(userVO.getNickName()).setAvatarUrl(userVO.getAvatarUrl());
+        updateById(user);
+
+        // 3.返回成功
+        return Response.success(convertUserToUserVO(selfId, user));
     }
 }

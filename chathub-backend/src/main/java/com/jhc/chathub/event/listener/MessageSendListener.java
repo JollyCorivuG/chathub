@@ -10,6 +10,8 @@ import com.jhc.chathub.service.IMessageService;
 import com.jhc.chathub.service.IRoomService;
 import com.jhc.chathub.service.ISseService;
 import com.jhc.chathub.service.IWebSocketService;
+import com.jhc.chathub.sse.SseRespType;
+import com.jhc.chathub.sse.SseResponse;
 import com.jhc.chathub.sse.SseSessionManager;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -60,7 +62,7 @@ public class MessageSendListener {
                 // 2.1构建信息列表的消息
                 List<RoomVO> roomList = messageService.getRoomList(userId);
                 // 2.2发送消息
-                sseService.send(userId, roomList);
+                sseService.send(userId, SseResponse.build(SseRespType.FRESH_ROOM_LIST.getCode(), roomList));
             }
         });
     }

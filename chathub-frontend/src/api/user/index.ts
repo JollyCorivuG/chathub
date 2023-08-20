@@ -5,7 +5,7 @@ import type {
     LoginParams,
     LoginResponse,
     RegisterParams,
-    RegisterResponse
+    RegisterResponse, UserInfo
 } from './type'
 import {GetUserInfoResponse, SearchUserResponse} from "./type";
 
@@ -25,7 +25,9 @@ enum UserApi {
     // 根据关键字查询用户
     searchUserUrl = '/users/query',
     // 根据用户id查询用户信息
-    getUserInfoByIdUrl = '/users/info'
+    getUserInfoByIdUrl = '/users/info',
+    // 更新用户信息
+    updateUserInfoUrl = '/users/info/me',
 }
 
 // 登录
@@ -51,3 +53,6 @@ export const reqSearchUser = (keyword: string, currentPage: number) => request.g
 
 // 根据用户id查询用户信息
 export const reqGetUserInfoById = (userId: number) => request.get<any, GetUserInfoResponse>(UserApi.getUserInfoByIdUrl + `/${userId}`)
+
+// 更新用户信息
+export const reqUpdateUserInfo = (userInfo: UserInfo) => request.put<any, GetUserInfoResponse>(UserApi.updateUserInfoUrl, userInfo)
