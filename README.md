@@ -11,11 +11,14 @@
 - 用户注册、登录（含账号、手机验证码两种登录方式）
 - 用户可以通过关键字搜索用户，并发送好友申请
 - 用户可以查看通知，同意或拒绝好友申请
+- 同一个账号只能在一个浏览器登录，否则原有账号会被强制下线
+- 用户可以修改头像、用户名等信息
 
 ### 消息
 - 用户可以发送消息给自己的好友（支持表情包、图片、文件等多种类型）
 - 用户可以实时接收消息
 - 消息面板自动刷新，会更新消息未读数
+- 用户可以删除会话信息，并在有消息时重新显示
 
 ### 动态
 - 用户可以发送动态，并可以选取相应的图片
@@ -26,16 +29,19 @@
 ### 前端
 - vue3 + ts
 - Vant4 UI
-- axios请求库
-- pinia状态管理
+- axios 请求库
+- pinia 状态管理
+- pinia 持久化插件
+- Vue Router 路由管理
 
 ### 后端
-- JDK17 + Spring Boot框架（spring boot3.1）
-- Spring MVC + Mybatis Plus框架
+- JDK17 + Spring Boot 框架（spring boot3.1）
+- Spring MVC + Mybatis Plus 框架
 - Knife4j + Swagger 生成接口文档
 - mysql8.x (数据存储) + redis（缓存）
 - Netty + Websocket 实现即时通讯
 - SSE 实现消息列表实时刷新
 - RabbitMQ 消息队列
 - MinIO 实现文件存储
+- redis 实现分布式session
 
