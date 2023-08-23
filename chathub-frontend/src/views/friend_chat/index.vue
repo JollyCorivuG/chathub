@@ -303,8 +303,6 @@ const ws: WS = new WS(buildWSUrl(userStore.token, msgStore.roomId))
 const messagePanel = ref<HTMLElement>()
 const sseStore = useSseStore()
 onMounted(async () => {
-    // 移除sse连接
-    sseStore.removeSseConnection()
     msgStore.initData()
     await getMsgList()
     if (messagePanel.value) {

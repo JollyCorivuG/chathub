@@ -11,7 +11,7 @@ import com.jhc.chathub.pojo.vo.ShowMsgVO;
 import java.util.List;
 
 public interface IMessageService extends IService<Message> {
-    Long sendMsg(SendMsgDTO sendMsg);
+    Long sendMsg(Long userId, SendMsgDTO sendMsg);
 
     void updateUserReadLatestMsg(Long userId, Long roomId, Long msgId);
 

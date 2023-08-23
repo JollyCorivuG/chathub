@@ -18,7 +18,7 @@ public class LikeInitMain {
             factory.setHost("localhost");
             Connection connection = factory.newConnection();
             Channel channel = connection.createChannel();
-            channel.exchangeDeclare(MqConstant.LIKE_EXCHANGE, "direct");
+            channel.exchangeDeclare(MqConstant.LIKE_EXCHANGE, "direct", true);
             channel.queueDeclare(MqConstant.LIKE_QUEUE, true, false, false, null);
             channel.queueBind(MqConstant.LIKE_QUEUE, MqConstant.LIKE_EXCHANGE, MqConstant.LIKE_ROUTING_KEY);
         } catch (Exception e) {

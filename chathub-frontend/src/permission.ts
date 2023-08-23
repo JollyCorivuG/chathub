@@ -45,6 +45,7 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
         await userStore.logout()
         showNotify({type: 'primary', message: '已退出登录!'})
     }
+
     next()
 })
 

@@ -10,6 +10,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jhc.chathub.common.constants.RedisConstant;
 import com.jhc.chathub.common.constants.SystemConstant;
+import com.jhc.chathub.common.enums.ErrorStatus;
+import com.jhc.chathub.common.exception.ThrowUtils;
 import com.jhc.chathub.common.resp.Response;
 import com.jhc.chathub.mapper.FriendRelationMapper;
 import com.jhc.chathub.mapper.UserMapper;
@@ -75,15 +77,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public Response<String> login(LoginFormDTO loginForm) {
         // 1.根据账号查询用户
         List<User> users = query().eq("account", loginForm.getAccount()).list();
-        if (users.isEmpty()) {
-            return Response.fail("账号不存在, 请先注册!");
-        }
+        ThrowUtils.throwIf(users.isEmpty(), ErrorStatus.PARAMS_ERROR, "账号不存在, 请先注册!");
 
         // 2.校验密码
         User user = users.get(0);
-        if (!PasswordEncoder.matches(user.getPassword(), loginForm.getPassword())) {
-            return Response.fail("密码错误!");
-        }
+        ThrowUtils.throwIf(!PasswordEncoder.matches(user.getPassword(), loginForm.getPassword()), ErrorStatus.PARAMS_ERROR, "密码错误!");
 
         // 3.颁发token并返回数据
         return releaseToken(user);
@@ -106,19 +104,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public Response<String> phoneLogin(PhoneLoginFormDTO phoneLoginForm) {
         // 1.根据手机号查询用户
         List<User> users = query().eq("phone", phoneLoginForm.getPhone()).list();
-        if (users.isEmpty()) {
-            return Response.fail("该手机号未注册账号, 请先注册!");
-        }
+        ThrowUtils.throwIf(users.isEmpty(), ErrorStatus.PARAMS_ERROR, "该手机号未注册账号, 请先注册!");
 
         // 2.校验验证码
         User user = users.get(0);
         String rightCode = stringRedisTemplate.opsForValue().get(RedisConstant.PHONE_CODE_KEY + phoneLoginForm.getPhone());
-        if (rightCode == null) {
-            return Response.fail("验证码已过期, 请重新获取验证码!");
-        }
-        if (!rightCode.equals(phoneLoginForm.getCode())) {
-            return Response.fail("验证码错误!");
-        }
+        ThrowUtils.throwIf(rightCode == null, ErrorStatus.OPERATION_ERROR, "验证码已过期, 请重新获取验证码!");
+        ThrowUtils.throwIf(!rightCode.equals(phoneLoginForm.getCode()), ErrorStatus.PARAMS_ERROR, "验证码错误!");
 
         // 3.颁发token并返回数据
         return releaseToken(user);
@@ -128,9 +120,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public Response<String> register(RegisterFormDTO registerForm) {
         // 1.先判断手机号和账号是否已经被注册
         List<User> users = query().eq("phone", registerForm.getPhone()).or().eq("account", registerForm.getAccount()).list();
-        if (!users.isEmpty()) {
-            return Response.fail("该手机号或账号已被注册!");
-        }
+        ThrowUtils.throwIf(!users.isEmpty(), ErrorStatus.PARAMS_ERROR, "该手机号或账号已被注册!");
 
         // 2.生成user实例并插入数据库
         User user = new User();
@@ -182,9 +172,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public Response<UserVO> getUserInfo(Long selfId, Long userId) {
         // 1.查询用户信息
         User user = getById(userId);
-        if (user == null) {
-            return Response.fail("所要查询用户不存在!");
-        }
+        ThrowUtils.throwIf(user == null, ErrorStatus.NOT_FOUND_ERROR);
 
         // 2.将user转换为userVO返回
         return Response.success(convertUserToUserVO(selfId, user));
@@ -257,9 +245,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public Response<UserVO> updateUserInfo(Long selfId, UserVO userVO) {
         // 1.根据id查询用户
         User user = getById(selfId);
-        if (user == null) {
-            return Response.fail("用户不存在!");
-        }
+        ThrowUtils.throwIf(user == null, ErrorStatus.NOT_FOUND_ERROR);
 
         // 2.更新用户信息
         user.setNickName(userVO.getNickName()).setAvatarUrl(userVO.getAvatarUrl());

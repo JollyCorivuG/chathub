@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jhc.chathub.common.constants.RedisConstant;
 import com.jhc.chathub.common.constants.SystemConstant;
+import com.jhc.chathub.common.enums.ErrorStatus;
+import com.jhc.chathub.common.exception.ThrowUtils;
 import com.jhc.chathub.common.resp.Response;
 import com.jhc.chathub.mapper.FriendNoticeMapper;
 import com.jhc.chathub.mapper.FriendRelationMapper;
@@ -48,15 +50,11 @@ public class FriendServiceImpl extends ServiceImpl<FriendRelationMapper, FriendR
     public Response<Void> friendApplication(FriendApplication friendApplication) {
         // 1.查询对方信息
         User user = userService.getById(friendApplication.getToUserId());
-        if (user == null) {
-            return Response.fail("所要添加的用户不存在");
-        }
+        ThrowUtils.throwIf(user == null, ErrorStatus.PARAMS_ERROR);
 
         // 2.判断是否已经是好友
         Long selfId = UserHolder.getUser().getId();
-        if (isFriend(selfId, friendApplication.getToUserId())) {
-            return Response.fail("该用户已经是你的好友");
-        }
+        ThrowUtils.throwIf(isFriend(selfId, friendApplication.getToUserId()), ErrorStatus.PARAMS_ERROR, "该用户已经是你的好友");
 
         // 3.创建两个通知
         // 3.1 创建自己的通知
@@ -88,16 +86,14 @@ public class FriendServiceImpl extends ServiceImpl<FriendRelationMapper, FriendR
         // 1.查询通知
         Long selfId = UserHolder.getUser().getId();
         FriendNotice friendNotice = friendNoticeMapper.selectById(friendApplicationReply.getNoticeId());
-        if (friendNotice == null || !Objects.equals(friendNotice.getConnectUserId(), selfId)) {
-            return Response.fail("该通知不存在或不是自己的通知");
-        }
+        ThrowUtils.throwIf(friendNotice == null || !Objects.equals(friendNotice.getOtherUserId(), selfId),
+                ErrorStatus.NOT_FOUND_ERROR, "该通知不存在或不是自己的通知");
 
         // 2.判断是否已经是好友
         String key = RedisConstant.USER_FRIEND_KEY + selfId;
         Long otherId = friendApplicationReply.getUserId();
-        if (Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(key, otherId.toString()))) {
-            return Response.fail("该用户已经是你的好友");
-        }
+        ThrowUtils.throwIf(Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(key, otherId.toString())),
+                ErrorStatus.PARAMS_ERROR, "该用户已经是你的好友");
 
         // 3.判断是同意还是拒绝
         boolean isAccept = friendApplicationReply.getIsAccept();
@@ -155,9 +151,7 @@ public class FriendServiceImpl extends ServiceImpl<FriendRelationMapper, FriendR
     public Response<Void> deleteFriend(Long id) {
         // 1.先判断是否是好友
         Long selfId = UserHolder.getUser().getId();
-        if (!isFriend(selfId, id)) {
-            return Response.fail("该用户不是你的好友");
-        }
+        ThrowUtils.throwIf(!isFriend(selfId, id), ErrorStatus.OPERATION_ERROR, "该用户不是你的好友");
 
         // 2.再删除redis中的好友关系
         stringRedisTemplate.opsForSet().remove(RedisConstant.USER_FRIEND_KEY + selfId, id.toString());

@@ -1,5 +1,7 @@
 package com.jhc.chathub.controller;
 
+import com.jhc.chathub.common.enums.ErrorStatus;
+import com.jhc.chathub.common.exception.ThrowUtils;
 import com.jhc.chathub.common.resp.Response;
 import com.jhc.chathub.mapper.FriendNoticeMapper;
 import com.jhc.chathub.pojo.vo.FriendNoticeVO;
@@ -30,10 +32,7 @@ public class NoticeController {
     @Operation(summary = "删除好友通知")
     public Response<Void> deleteFriendNotice(@PathVariable Long id) {
         int isSuccess = friendNoticeMapper.deleteById(id);
-        if (isSuccess == 0) {
-            return Response.fail("删除该通知失败");
-        } else {
-            return Response.success(null);
-        }
+        ThrowUtils.throwIf(isSuccess != 1, ErrorStatus.OPERATION_ERROR);
+        return Response.success(null);
     }
 }

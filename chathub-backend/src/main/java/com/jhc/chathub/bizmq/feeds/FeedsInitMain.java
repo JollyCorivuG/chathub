@@ -18,7 +18,7 @@ public class FeedsInitMain {
             factory.setHost("localhost");
             Connection connection = factory.newConnection();
             Channel channel = connection.createChannel();
-            channel.exchangeDeclare(MqConstant.FEEDS_EXCHANGE, "direct");
+            channel.exchangeDeclare(MqConstant.FEEDS_EXCHANGE, "direct", true);
             channel.queueDeclare(MqConstant.FEEDS_QUEUE, true, false, false, null);
             channel.queueBind(MqConstant.FEEDS_QUEUE, MqConstant.FEEDS_EXCHANGE, MqConstant.FEEDS_ROUTING_KEY);
         } catch (Exception e) {

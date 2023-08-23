@@ -1,5 +1,7 @@
 package com.jhc.chathub.sse;
 
+import com.jhc.chathub.common.enums.ErrorStatus;
+import com.jhc.chathub.common.exception.ThrowUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
@@ -15,9 +17,7 @@ public class SseSessionManager {
 
     // 添加SseEmitter
     public static void add(Long userId, SseEmitter sseEmitter) {
-        if (isExist(userId)) {
-            throw new RuntimeException("该用户已经有一个SseEmitter了");
-        }
+        ThrowUtils.throwIf(isExist(userId), ErrorStatus.OPERATION_ERROR, "该用户已经有一个SseEmitter了");
         SESSION_MAP.put(userId, sseEmitter);
     }
 
@@ -29,9 +29,7 @@ public class SseSessionManager {
     // 移除SseEmitter
     public static void remove(Long userId) {
         SseEmitter sseEmitter = SESSION_MAP.get(userId);
-        if (sseEmitter == null) {
-            throw new RuntimeException("该用户没有SseEmitter");
-        }
+        ThrowUtils.throwIf(sseEmitter == null, ErrorStatus.OPERATION_ERROR, "该用户没有SseEmitter");
         sseEmitter.complete();
         SESSION_MAP.remove(userId);
     }
@@ -39,18 +37,14 @@ public class SseSessionManager {
     // 发生错误
     public static void onError(Long userId, Throwable throwable) {
         SseEmitter sseEmitter = SESSION_MAP.get(userId);
-        if (sseEmitter == null) {
-            throw new RuntimeException("该用户没有SseEmitter");
-        }
+        ThrowUtils.throwIf(sseEmitter == null, ErrorStatus.OPERATION_ERROR, "该用户没有SseEmitter");
         sseEmitter.completeWithError(throwable);
     }
 
     // 发送消息
     public static void send(Long userId, Object data) throws IOException {
         SseEmitter sseEmitter = SESSION_MAP.get(userId);
-        if (sseEmitter == null) {
-            throw new RuntimeException("该用户没有SseEmitter");
-        }
+        ThrowUtils.throwIf(sseEmitter == null, ErrorStatus.OPERATION_ERROR, "该用户没有SseEmitter");
         sseEmitter.send(data);
     }
 }

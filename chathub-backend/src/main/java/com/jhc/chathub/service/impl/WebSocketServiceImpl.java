@@ -1,5 +1,6 @@
 package com.jhc.chathub.service.impl;
 
+import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.jhc.chathub.common.constants.SystemConstant;
@@ -37,6 +38,9 @@ public class WebSocketServiceImpl implements IWebSocketService {
     // 线程池执行推送消息
     private static final ExecutorService SEND_MSG_TASK_EXECUTOR = Executors.newFixedThreadPool(10);
 
+    // 记录所有连接到用户
+    private static final ConcurrentHashSet<Long> ONLINE_USER_SET = new ConcurrentHashSet<>();
+
     @Override
     public void authorize(Channel channel) {
         // 1.得到channel中的token并进行认证
@@ -66,6 +70,7 @@ public class WebSocketServiceImpl implements IWebSocketService {
             ROOM_CHANNEL_MAP.put(roomId, new CopyOnWriteArrayList<>());
         }
         ROOM_CHANNEL_MAP.get(roomId).add(channel);
+        ONLINE_USER_SET.add(NettyUtil.getAttr(channel, NettyUtil.UID));
     }
 
     @Override
@@ -73,6 +78,7 @@ public class WebSocketServiceImpl implements IWebSocketService {
         Long roomId = NettyUtil.getAttr(channel, NettyUtil.ROOM_ID);
         if (ROOM_CHANNEL_MAP.containsKey(roomId)) {
             ROOM_CHANNEL_MAP.get(roomId).remove(channel);
+            ONLINE_USER_SET.remove(NettyUtil.getAttr(channel, NettyUtil.UID));
         }
     }
 
@@ -99,8 +105,12 @@ public class WebSocketServiceImpl implements IWebSocketService {
 
     @Override
     public void showOnlineUser() {
-        ROOM_CHANNEL_MAP.forEach((roomId, channels) -> {
-            log.info("房间号: {}, 在线人数: {}", roomId, channels.size());
-        });
+        log.info("当前在线人数: {}", ONLINE_USER_SET.size());
+        ROOM_CHANNEL_MAP.forEach((roomId, channels) -> log.info("房间号: {}, 在线人数: {}", roomId, channels.size()));
+    }
+
+    @Override
+    public boolean isExist(Long userId) {
+        return ONLINE_USER_SET.contains(userId);
     }
 }

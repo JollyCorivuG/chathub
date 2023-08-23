@@ -1,6 +1,5 @@
 package com.jhc.chathub.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jhc.chathub.common.constants.RedisConstant;
@@ -8,7 +7,8 @@ import com.jhc.chathub.common.constants.SystemConstant;
 import com.jhc.chathub.common.resp.CursorPageBaseResp;
 import com.jhc.chathub.event.MessageSendEvent;
 import com.jhc.chathub.mapper.MessageMapper;
-import com.jhc.chathub.pojo.dto.message.*;
+import com.jhc.chathub.pojo.dto.message.MsgPageReq;
+import com.jhc.chathub.pojo.dto.message.SendMsgDTO;
 import com.jhc.chathub.pojo.entity.Message;
 import com.jhc.chathub.pojo.vo.RoomVO;
 import com.jhc.chathub.pojo.vo.ShowMsgVO;
@@ -16,6 +16,9 @@ import com.jhc.chathub.pojo.vo.UserVO;
 import com.jhc.chathub.service.IFriendService;
 import com.jhc.chathub.service.IMessageService;
 import com.jhc.chathub.service.IUserService;
+import com.jhc.chathub.service.adapter.MsgAdapter;
+import com.jhc.chathub.service.strategy.msg.AbstractMsgHandler;
+import com.jhc.chathub.service.strategy.msg.MsgHandlerFactory;
 import com.jhc.chathub.utils.CursorUtils;
 import com.jhc.chathub.utils.UserHolder;
 import jakarta.annotation.Resource;
@@ -44,25 +47,6 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     @Resource
     private IFriendService friendService;
 
-
-    private void setMsgExtra(Message message, SendMsgDTO sendMsg) throws IllegalArgumentException {
-        Integer msgType = sendMsg.getMsgType();
-        if (Objects.equals(msgType, SystemConstant.TEXT_MSG)) {
-            TextMsgDTO textMsg = BeanUtil.toBean(sendMsg.getBody(), TextMsgDTO.class);
-            message.setContent(textMsg.getContent());
-        } else if (Objects.equals(msgType, SystemConstant.IMG_MSG)) {
-            ImgMsgDTO imgMsg = BeanUtil.toBean(sendMsg.getBody(), ImgMsgDTO.class);
-            message.setExtra(new MessageExtra().setImgMsg(imgMsg));
-        } else if (Objects.equals(msgType, SystemConstant.FILE_MSG)) {
-            FileMsgDTO fileMsg = BeanUtil.toBean(sendMsg.getBody(), FileMsgDTO.class);
-            message.setExtra(new MessageExtra().setFileMsg(fileMsg));
-        } else {
-            // 抛出异常
-            log.info("未知消息类型");
-            throw new IllegalArgumentException("未知消息类型");
-        }
-    }
-
     @Override
     public void updateUserReadLatestMsg(Long userId, Long roomId, Long msgId) {
         String userLatestMsgKey = RedisConstant.USER_READ_LATEST_MESSAGE + userId + ":" + roomId;
@@ -78,39 +62,26 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
 
     @Override
     public ShowMsgVO convertToShowMsgVO(Message message) {
-        ShowMsgVO showMsg = new ShowMsgVO();
-        showMsg.setFromUser(new ShowMsgVO.UserInfo().setId(message.getFromUserId()));
-        ShowMsgVO.MessageInfo messageInfo = new ShowMsgVO.MessageInfo();
-        BeanUtil.copyProperties(message, messageInfo);
-        messageInfo.setSendTime(message.getCreateTime());
-        if (Objects.equals(message.getMsgType(), SystemConstant.TEXT_MSG)) {
-            TextMsgDTO textMsg = new TextMsgDTO().setContent(message.getContent());
-            messageInfo.setBody(textMsg);
-        } else {
-            messageInfo.setBody(message.getExtra());
-        }
-        showMsg.setMessage(messageInfo);
-        return showMsg;
+        return MsgAdapter.buildMsgResp(message);
     }
 
     @Override
-    public Long sendMsg(SendMsgDTO sendMsg) {
+    public Long sendMsg(Long userId, SendMsgDTO sendMsg) {
         // 1.将sendMsg转换为Message对象并保存到数据库
-        Long userId = UserHolder.getUser().getId();
-        Message saveMsg = new Message();
-        saveMsg.setRoomId(sendMsg.getRoomId())
-                .setFromUserId(userId)
-                .setMsgType(sendMsg.getMsgType());
-        setMsgExtra(saveMsg, sendMsg);
-        save(saveMsg);
-        stringRedisTemplate.opsForValue().set(RedisConstant.ROOM_LATEST_MESSAGE + sendMsg.getRoomId(), String.valueOf(saveMsg.getId()));
-        updateUserReadLatestMsg(userId, sendMsg.getRoomId(), saveMsg.getId());
+        AbstractMsgHandler msgHandler = MsgHandlerFactory.getStrategy(sendMsg.getMsgType());
+        msgHandler.checkMsg(userId, sendMsg);
+        Message save = msgHandler.saveMsg(userId, sendMsg);
+        save(save);
 
-        // 2.发布消息发送事件
-        applicationEventPublisher.publishEvent(new MessageSendEvent(this, saveMsg.getId()));
+        // 2.更新redis中房间最新消息id以及用户最新读取消息id
+        stringRedisTemplate.opsForValue().set(RedisConstant.ROOM_LATEST_MESSAGE + sendMsg.getRoomId(), String.valueOf(save.getId()));
+        updateUserReadLatestMsg(userId, sendMsg.getRoomId(), save.getId());
 
-        // 3.返回保存的消息
-        return saveMsg.getId();
+        // 3.发布消息发送事件
+        applicationEventPublisher.publishEvent(new MessageSendEvent(this, save.getId()));
+
+        // 4.返回保存的消息
+        return save.getId();
     }
 
     @Override
@@ -161,6 +132,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         return rooms;
     }
 
+    // TODO
     private List<RoomVO> getGroupRooms(Long selfId, List<Long> groupIds) {
         return Collections.emptyList();
     }

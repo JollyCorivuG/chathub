@@ -58,7 +58,7 @@ public class MessageSendListener {
 
         // 2.遍历用户列表，如果其存在SseEmitter，则发送消息
         userIds.forEach(userId -> {
-            if (SseSessionManager.isExist(userId)) {
+            if (SseSessionManager.isExist(userId) && !webSocketService.isExist(userId)) {
                 // 2.1构建信息列表的消息
                 List<RoomVO> roomList = messageService.getRoomList(userId);
                 // 2.2发送消息

@@ -25,3 +25,7 @@ window.addEventListener('beforeunload', () => {
     const sseStore = useSseStore()
     sseStore.removeSseConnection()
 })
+
+// 建立sse连接
+const sseStore = useSseStore()
+sseStore.buildSseConnection()

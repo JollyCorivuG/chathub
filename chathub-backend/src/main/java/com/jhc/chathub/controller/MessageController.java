@@ -25,7 +25,7 @@ public class MessageController {
     @PostMapping("/send")
     @Operation(summary = "发送消息")
     public Response<ShowMsgVO> sendMessage(@RequestBody SendMsgDTO sendMsg) {
-        Long msgId = messageService.sendMsg(sendMsg);
+        Long msgId = messageService.sendMsg(UserHolder.getUser().getId(), sendMsg);
         return Response.success(messageService.convertToShowMsgVO(messageService.getById(msgId)));
     }
 

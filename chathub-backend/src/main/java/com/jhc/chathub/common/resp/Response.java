@@ -19,8 +19,8 @@ public class Response<T> {
         Response<T> response = new Response<>();
         return response.setStatusCode(errorStatus.getCode()).setStatusMsg(errorStatus.getMessage());
     }
-    public static <T> Response<T> fail(String errorMsg) {
+    public static <T> Response<T> fail(Integer code, String message) {
         Response<T> response = new Response<>();
-        return response.setStatusCode(SystemConstant.COMMON_ERROR).setStatusMsg(errorMsg);
+        return response.setStatusCode(code).setStatusMsg(message);
     }
 }

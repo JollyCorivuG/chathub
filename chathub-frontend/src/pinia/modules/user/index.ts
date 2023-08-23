@@ -33,6 +33,10 @@ const useUserStore = defineStore('User', {
             // 3.将个人信息保存到localStorage中
             localStorage.setItem('userInfo', JSON.stringify(resp.data))
             this.userInfo = resp.data
+
+            // 4.建立sse连接
+            const sseStore = useSseStore()
+            sseStore.buildSseConnection()
         },
         async login(loginForm: LoginParams): Promise<CommonResponse> {
             const resp: LoginResponse = await reqLogin(loginForm)

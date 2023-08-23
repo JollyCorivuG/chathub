@@ -46,7 +46,7 @@ public class SseServiceImpl implements ISseService {
 
         // 2.创建SseEmitter并加入到SseSessionManager中
         SseEmitter sseEmitter = newSseEmitter(userId);
-        log.info("type: SseSession Add, session Id : {}", userId);;
+        log.info("type: SseSession Add, session Id : {}", userId);
         SseSessionManager.add(userId, sseEmitter);
 
         // 3.返回SseEmitter
