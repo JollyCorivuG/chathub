@@ -36,6 +36,9 @@ const actions = [
 const onSelect = (item: any) => {
     switch (item.text) {
         case '创建群聊':
+            router.push({
+                path: '/create_group',
+            })
             break
         case '加好友/群':
             router.push({

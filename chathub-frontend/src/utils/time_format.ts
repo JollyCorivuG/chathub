@@ -6,6 +6,16 @@ export const convertJavaTimeToTimeStamp = (jTime: string): number => {
     return Date.parse(jTime)
 }
 
+export const convertJavaTimeToStringYearMonthDay = (jTime: string): string => {
+    const date: Date = new Date(jTime)
+    const year: number = date.getFullYear()
+    const month: number = date.getMonth() + 1
+    const day: number = date.getDate()
+    const formatMonth: string = month < 10 ? `0${month}` : `${month}`
+    const formatDay: string = day < 10 ? `0${day}` : `${day}`
+    return `${year}年${formatMonth}月${formatDay}日`
+}
+
 export const convertTimeStampToJavaTime = (timeStamp: number): string => {
     // 将时间戳转换为时间格式为：2021-08-01T12:00:00不要后面的.000Z
     const date: Date = new Date(timeStamp)

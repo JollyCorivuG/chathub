@@ -34,4 +34,10 @@ public class SseController {
         Long userId = UserHolder.getUser().getId();
         sseService.close(userId);
     }
+
+    @PostMapping(value = "/unsubscribe")
+    @Operation(summary = "取消订阅SSE")
+    public void unsubscribe(@RequestParam("userId") Long userId) {
+        sseService.close(userId);
+    }
 }

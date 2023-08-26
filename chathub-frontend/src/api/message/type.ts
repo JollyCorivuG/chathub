@@ -1,5 +1,6 @@
 // 通用响应信息
 import {UserInfo} from "@/api/user/type.ts";
+import {GroupInfo} from "@/api/group/type.ts";
 
 export interface CommonResponse {
     statusCode: number,
@@ -76,7 +77,7 @@ export interface MessageListResponse extends CommonResponse {
 export interface Room {
     id: number,
     roomType: number,
-    connectInfo: UserInfo,
+    connectInfo: UserInfo | GroupInfo,
     latestMsg: ShowMsg,
     unreadCount: number
 }

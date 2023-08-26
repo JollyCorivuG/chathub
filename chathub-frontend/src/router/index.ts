@@ -78,6 +78,14 @@ export default createRouter({
             component: () => import('@/views/change_info/index.vue'),
         },
         {
+            path: '/create_group',
+            component: () => import('@/views/create_group/index.vue'),
+        },
+        {
+            path: '/group_page',
+            component: () => import('@/views/group_page/index.vue'),
+        },
+        {
             path: '/404',
             component: () => import('@/views/404/index.vue')
         }

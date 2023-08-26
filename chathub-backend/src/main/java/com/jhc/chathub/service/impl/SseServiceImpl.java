@@ -1,5 +1,8 @@
 package com.jhc.chathub.service.impl;
 
+import com.jhc.chathub.common.enums.ErrorStatus;
+import com.jhc.chathub.common.exception.BizException;
+import com.jhc.chathub.common.exception.ThrowUtils;
 import com.jhc.chathub.pojo.vo.ForceLogoutInfo;
 import com.jhc.chathub.service.ISseService;
 import com.jhc.chathub.sse.SseRespType;
@@ -41,6 +44,7 @@ public class SseServiceImpl implements ISseService {
         if (SseSessionManager.isExist(userId)) {
             // 1.1如果已经存在, 则发布一个强制下线的消息
             send(userId, SseResponse.build(SseRespType.FORCE_LOGOUT.getCode(), ForceLogoutInfo.builder().time(LocalDateTime.now()).build()));
+            // 1.2然后关闭之前的SseEmitter
             SseSessionManager.remove(userId);
         }
 
@@ -61,14 +65,11 @@ public class SseServiceImpl implements ISseService {
 
     @Override
     public void send(Long userId, Object data) {
-        if (!SseSessionManager.isExist(userId)) {
-            throw new RuntimeException("该用户没有SseEmitter");
-        }
+        ThrowUtils.throwIf(!SseSessionManager.isExist(userId), ErrorStatus.OPERATION_ERROR, "该用户没有SseEmitter");
         try {
             SseSessionManager.send(userId, data);
         } catch (Exception e) {
-            log.error("type: SseSession Send Error, msg: {} session Id : {}",e.getMessage(), userId);
-            SseSessionManager.onError(userId, e);
+            throw new BizException(ErrorStatus.OPERATION_ERROR, "发送Sse消息失败");
         }
     }
 }

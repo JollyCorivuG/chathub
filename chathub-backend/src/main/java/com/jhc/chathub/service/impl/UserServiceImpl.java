@@ -14,12 +14,16 @@ import com.jhc.chathub.common.enums.ErrorStatus;
 import com.jhc.chathub.common.exception.ThrowUtils;
 import com.jhc.chathub.common.resp.Response;
 import com.jhc.chathub.mapper.FriendRelationMapper;
+import com.jhc.chathub.mapper.GroupMapper;
+import com.jhc.chathub.mapper.GroupRelationMapper;
 import com.jhc.chathub.mapper.UserMapper;
 import com.jhc.chathub.pojo.dto.user.LoginFormDTO;
 import com.jhc.chathub.pojo.dto.user.PhoneLoginFormDTO;
 import com.jhc.chathub.pojo.dto.user.RegisterFormDTO;
 import com.jhc.chathub.pojo.dto.user.UserDTO;
 import com.jhc.chathub.pojo.entity.FriendRelation;
+import com.jhc.chathub.pojo.entity.Group;
+import com.jhc.chathub.pojo.entity.GroupRelation;
 import com.jhc.chathub.pojo.entity.User;
 import com.jhc.chathub.pojo.vo.UserVO;
 import com.jhc.chathub.service.IUserService;
@@ -35,6 +39,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -47,6 +52,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Resource
     private Environment environment;
+
+    @Resource
+    private GroupMapper groupMapper;
+
+    @Resource
+    private GroupRelationMapper groupRelationMapper;
 
     private Response<String> releaseToken(User user) {
         // 1.生成token
@@ -237,8 +248,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public List<Long> queryGroupIds(Long userId) {
-        // TODO
-        return Collections.emptyList();
+        // 1.先查询自己是群主的群组
+        QueryWrapper<Group> wrapper1 = new QueryWrapper<Group>().eq("owner_id", userId);
+        List<Long> groupIds = groupMapper.selectList(wrapper1).stream().map(Group::getId).toList();
+
+        // 2.再查询自己加入的群组
+        QueryWrapper<GroupRelation> wrapper2 = new QueryWrapper<GroupRelation>().eq("user_id", userId);
+        List<Long> groupIds2 = groupRelationMapper.selectList(wrapper2).stream().map(GroupRelation::getGroupId).toList();
+
+        // 3.一起返回
+        return Stream.of(groupIds, groupIds2).flatMap(Collection::stream).toList();
     }
 
     @Override

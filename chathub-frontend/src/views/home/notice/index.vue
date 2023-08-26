@@ -42,19 +42,54 @@
             <van-empty v-else description="暂无好友通知" />
         </van-collapse-item>
         <van-collapse-item title="群通知" name="group-notice" icon="cluster-o">
-<!--            TODO 群通知-->
+            <van-swipe-cell v-if="groupNoticeList.length != 0" v-for="(groupNotice, index) in groupNoticeList" :key="index">
+                <div class="notice-container">
+                    <div class="notice-info">
+                        <div class="left">
+                            <van-image width="50px" height="50px" :src="groupNotice.showGroupInfo.avatar" round/>
+                        </div>
+                        <div class="right">
+                            <div class="nickname" style="color: black;font-size: 18px">
+                                <span>{{groupNotice.showGroupInfo.name}}</span>
+                            </div>
+                            <div class="description">
+                                <span>{{groupNotice.description}}</span>
+                            </div>
+                            <div class="create-time">
+                                <span>{{convertJavaTimeToString(groupNotice.createTime)}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="status">
+                        <div>
+                            <span v-if="groupNotice.statusInfo == 2" style="margin-right: 10px;width: 50px;display: block;">已拒绝</span>
+                            <span v-else-if="groupNotice.statusInfo == 1" style="margin-right: 10px;width: 50px;display: block;">已同意</span>
+                            <div v-else style="display:flex;align-items: center">
+                                <van-button style="border: none; padding: 0;color: #1989FA; margin-right: 8px;width: 30px;" @click="groupApplyReply(groupNotice, true) ">同意</van-button>
+                                <van-button style="border: none; padding: 0; color:#7f7f7f; margin-right: 10px; width: 30px;" @click="groupApplyReply(groupNotice, false)">拒绝</van-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <template #right>
+                    <van-button square text="删除" type="danger" style="height: 100%;" @click="deleteGroupNotice(groupNotice.id)"/>
+                </template>
+            </van-swipe-cell>
+            <van-empty v-else description="暂无群组通知" />
         </van-collapse-item>
     </van-collapse>
 </template>
 
 <script setup lang="ts">
 import {ref, onMounted} from "vue";
-import {FriendNotice, FriendNoticeList, FriendNoticeListResponse} from "@/api/notice/type.ts";
-import {reqFriendNoticeList, reqDeleteFriendNotice} from "@/api/notice";
+import {FriendNotice, FriendNoticeList, FriendNoticeListResponse, GroupNoticeListResponse, GroupNotice} from "@/api/notice/type.ts";
+import {reqFriendNoticeList, reqDeleteFriendNotice, reqDeleteGroupNotice, reqGroupNoticeList} from "@/api/notice";
 import {showNotify} from "vant";
 import {convertJavaTimeToString} from "@/utils/time_format";
 import {CommonResponse, HandleFriendRequestParams} from "@/api/friend/type.ts";
 import {reqFriendApplyReply} from "@/api/friend";
+import {reqInvitationResp} from "@/api/group";
+import {InvitationRespParams} from "@/api/group/type.ts";
 
 let active = ref<string>('')
 
@@ -79,7 +114,6 @@ const friendApplyReply = async (friendNotice: FriendNotice, isAccept: boolean) =
         userId: friendNotice.showUserInfo.id,
         isAccept: isAccept
     }
-    console.log(params)
     const resp: CommonResponse = await reqFriendApplyReply(params)
     if (resp.statusCode != 0) {
         showNotify({type: 'danger', message: resp.statusMsg})
@@ -99,6 +133,47 @@ const deleteFriendNotice = async (friendNoticeId: number) => {
         return friendNotice.id != friendNoticeId
     })
 }
+
+// 群组通知
+const groupNoticeList = ref<GroupNotice[]>([])
+const getGroupNotice = async () => {
+    const resp: GroupNoticeListResponse = await reqGroupNoticeList()
+    if (resp.statusCode != 0) {
+        showNotify({type: 'danger', message: resp.statusMsg})
+        return
+    }
+    groupNoticeList.value = resp.data
+}
+getGroupNotice()
+
+// 响应邀请
+const groupApplyReply = async (groupNotice: GroupNotice, isAgree: boolean) => {
+    const params: InvitationRespParams = {
+        groupId: groupNotice.showGroupInfo.id,
+        noticeId: groupNotice.id,
+        isAgree: isAgree
+    }
+    const resp: CommonResponse = await reqInvitationResp(params)
+    if (resp.statusCode != 0) {
+        showNotify({type: 'danger', message: resp.statusMsg})
+        return
+    }
+    groupNotice.statusInfo = isAgree ? 1 : 2
+}
+
+// 删除群组通知
+const deleteGroupNotice = async (groupNoticeId: number) => {
+    const resp: CommonResponse = await reqDeleteGroupNotice(groupNoticeId)
+    if (resp.statusCode != 0) {
+        showNotify({type: 'danger', message: resp.statusMsg})
+        return
+    }
+    groupNoticeList.value = groupNoticeList.value.filter((groupNotice) => {
+        return groupNotice.id != groupNoticeId
+    })
+}
+
+
 
 </script>
 

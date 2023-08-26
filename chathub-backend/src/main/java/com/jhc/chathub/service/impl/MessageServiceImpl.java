@@ -1,5 +1,6 @@
 package com.jhc.chathub.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jhc.chathub.common.constants.RedisConstant;
@@ -9,11 +10,14 @@ import com.jhc.chathub.event.MessageSendEvent;
 import com.jhc.chathub.mapper.MessageMapper;
 import com.jhc.chathub.pojo.dto.message.MsgPageReq;
 import com.jhc.chathub.pojo.dto.message.SendMsgDTO;
+import com.jhc.chathub.pojo.entity.Group;
 import com.jhc.chathub.pojo.entity.Message;
+import com.jhc.chathub.pojo.vo.GroupVO;
 import com.jhc.chathub.pojo.vo.RoomVO;
 import com.jhc.chathub.pojo.vo.ShowMsgVO;
 import com.jhc.chathub.pojo.vo.UserVO;
 import com.jhc.chathub.service.IFriendService;
+import com.jhc.chathub.service.IGroupService;
 import com.jhc.chathub.service.IMessageService;
 import com.jhc.chathub.service.IUserService;
 import com.jhc.chathub.service.adapter.MsgAdapter;
@@ -28,7 +32,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -46,6 +49,9 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
 
     @Resource
     private IFriendService friendService;
+
+    @Resource
+    private IGroupService groupService;
 
     @Override
     public void updateUserReadLatestMsg(Long userId, Long roomId, Long msgId) {
@@ -132,9 +138,37 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         return rooms;
     }
 
-    // TODO
     private List<RoomVO> getGroupRooms(Long selfId, List<Long> groupIds) {
-        return Collections.emptyList();
+        List<RoomVO> rooms = new ArrayList<>();
+        groupIds.forEach(groupId -> {
+            Group group = groupService.getById(groupId);
+            Long roomId = group.getRoomId();
+            String latestMsgId = stringRedisTemplate.opsForValue().get(RedisConstant.ROOM_LATEST_MESSAGE + roomId);
+            if (latestMsgId == null) {
+                return;
+            }
+            String latestDeleteMsgId = stringRedisTemplate.opsForValue().get(RedisConstant.USER_DELETE_LATEST_MESSAGE + selfId + ":" + roomId);
+            if (latestDeleteMsgId != null && Long.parseLong(latestDeleteMsgId) >= Long.parseLong(latestMsgId)) {
+                return;
+            }
+            ShowMsgVO message = convertToShowMsgVO(getById(Long.parseLong(latestMsgId)));
+            String latestReadMsgId = stringRedisTemplate.opsForValue().get(RedisConstant.USER_READ_LATEST_MESSAGE + selfId + ":" + roomId);
+            QueryWrapper<Message> wrapper = new QueryWrapper<>();
+            if (latestReadMsgId != null) {
+                wrapper.gt("id", latestReadMsgId);
+            }
+            wrapper.eq("room_id", roomId);
+            long unreadCount = count(wrapper);
+
+            RoomVO room = new RoomVO();
+            room.setId(roomId)
+                    .setRoomType(SystemConstant.ROOM_TYPE_GROUP)
+                    .setConnectInfo(BeanUtil.toBean(group, GroupVO.class))
+                    .setLatestMsg(message)
+                    .setUnreadCount((int) unreadCount);
+            rooms.add(room);
+        });
+        return rooms;
     }
 
     @Override

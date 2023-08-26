@@ -2,10 +2,35 @@
     <van-search placeholder="请输入搜索关键词" />
     <van-pull-refresh v-model="loading" @refresh="onRefresh" class="container">
         <van-swipe-cell v-for="(room, index) in roomStore.roomList" :key="index">
-            <div class="room" @click="goChat(room)">
-                <img :src="room.connectInfo.avatarUrl" alt="avatar" class="left">
+            <div class="room" @click="goChat(room)" v-if="room.roomType == 0">
+                <img :src="(room.connectInfo as UserInfo).avatarUrl" alt="avatar" class="left">
                 <div class="middle">
-                    <div class="name">{{room.connectInfo.nickName}}</div>
+                    <div class="name">{{(room.connectInfo as UserInfo).nickName}}</div>
+                    <div class="message-content">
+                        <span v-if="room.latestMsg.message.msgType == MsgType.TEXT">
+                            {{room.latestMsg.message.body.content}}
+                        </span>
+                        <span v-else-if="room.latestMsg.message.msgType == MsgType.IMG">
+                            [图片]
+                        </span>
+                        <span v-else-if="room.latestMsg.message.msgType == MsgType.FILE">
+                            [文件] {{room.latestMsg.message.body.fileMsg?.fileName}}
+                        </span>
+                    </div>
+                </div>
+                <div class="right">
+                    <div class="time">
+                        {{formatTime(room.latestMsg.message.sendTime)}}
+                    </div>
+                    <div class="unread-count" v-if="room.unreadCount != 0">
+                        {{room.unreadCount}}
+                    </div>
+                </div>
+            </div>
+            <div class="room" @click="goChat(room)" v-else>
+                <img :src="(room.connectInfo as GroupInfo).avatar" alt="avatar" class="left">
+                <div class="middle">
+                    <div class="name">{{(room.connectInfo as GroupInfo).name}} ({{(room.connectInfo as GroupInfo).peopleNum}})</div>
                     <div class="message-content">
                         <span v-if="room.latestMsg.message.msgType == MsgType.TEXT">
                             {{room.latestMsg.message.body.content}}
@@ -44,6 +69,8 @@ import {MsgType} from "@/api/message/type.ts";
 import {formatTime} from "@/utils/time_format.ts";
 import {useRouter} from "vue-router";
 import useRoomStore from "@/pinia/modules/room";
+import {UserInfo} from "@/api/user/type.ts";
+import {GroupInfo} from "../../../api/group/type.ts";
 
 // 会话列表
 const roomStore = useRoomStore()
@@ -62,7 +89,7 @@ const goChat = (room: Room) => {
     if (room.roomType == 0) {
         router.push({path: '/friend_chat', query: {roomId: room.id, friendId: room.connectInfo.id}})
     } else {
-        // TODO 群聊
+        router.push({path: '/group_chat', query: {roomId: room.id, groupId: room.connectInfo.id}})
     }
 }
 

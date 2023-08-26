@@ -20,6 +20,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Component
 @Slf4j
@@ -35,6 +37,9 @@ public class MessageSendListener {
 
     @Resource
     private IRoomService roomService;
+
+    // 线程池执行推送消息
+    private static final ExecutorService SSE_SEND_MSG_TASK_EXECUTOR = Executors.newFixedThreadPool(10);
 
 
     @Async
@@ -62,7 +67,7 @@ public class MessageSendListener {
                 // 2.1构建信息列表的消息
                 List<RoomVO> roomList = messageService.getRoomList(userId);
                 // 2.2发送消息
-                sseService.send(userId, SseResponse.build(SseRespType.FRESH_ROOM_LIST.getCode(), roomList));
+                SSE_SEND_MSG_TASK_EXECUTOR.execute(() -> sseService.send(userId, SseResponse.build(SseRespType.FRESH_ROOM_LIST.getCode(), roomList)));
             }
         });
     }

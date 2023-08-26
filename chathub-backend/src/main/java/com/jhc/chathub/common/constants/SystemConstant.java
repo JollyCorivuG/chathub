@@ -25,6 +25,11 @@ public class SystemConstant {
     public static final Integer NOTICE_STATUS_ACCEPT = 4; // 已接受
     public static final Integer NOTICE_STATUS_PENDING = 5; // 等待处理
 
+    // 群组通知的一些常量
+    public static final Integer GROUP_NOTICE_STATUS_PENDING = 0; // 等待处理
+    public static final Integer GROUP_NOTICE_STATUS_AGREE = 1; // 已同意
+    public static final Integer GROUP_NOTICE_STATUS_REFUSE = 2; // 已拒绝
+
     // 消息类型
     public static final Integer TEXT_MSG = 0;
     public static final Integer IMG_MSG = 1;

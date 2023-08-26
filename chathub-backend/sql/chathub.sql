@@ -113,3 +113,45 @@ CREATE TABLE `tb_like`  (
    PRIMARY KEY (`id`) USING BTREE,
    INDEX `idx_talk_uid`(`talk_id`) USING BTREE
 );
+
+DROP TABLE IF EXISTS `tb_group`;
+CREATE TABLE `tb_group`  (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `number` varchar(10) NOT NULL COMMENT '群号',
+    `name` varchar(32) NOT NULL COMMENT '群组名称',
+    `avatar` varchar(1024) NULL DEFAULT '' COMMENT '群组头像',
+    `people_num` int NOT NULL DEFAULT 0 COMMENT '群组人数',
+    `max_people_num` int NOT NULL DEFAULT 100 COMMENT '群组最大人数',
+    `owner_id` bigint(20) NOT NULL COMMENT '群主id',
+    `room_id` bigint(20) NOT NULL COMMENT '对应的房间id',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `idx_owner_id`(`owner_id`) USING BTREE,
+    INDEX `idx_room_id`(`room_id`) USING BTREE
+);
+
+DROP TABLE IF EXISTS `tb_group_relation`;
+CREATE TABLE `tb_group_relation`  (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `user_id` bigint(20) NOT NULL COMMENT '用户id',
+    `group_id` bigint(20) NOT NULL COMMENT '群组id',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `idx_group_id`(`group_id`) USING BTREE,
+    INDEX `idx_user_id`(`user_id`) USING BTREE
+);
+
+DROP TABLE IF EXISTS `tb_group_notice`;
+CREATE TABLE `tb_group_notice`  (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `user_id` bigint(20) NOT NULL COMMENT '用户id',
+    `group_id` bigint(20) NOT NULL COMMENT '群组id',
+    `description` varchar(100) NULL DEFAULT '' COMMENT '描述',
+    `status_info` tinyint NOT NULL COMMENT '状态信息，0-等待处理，1-已同意，2-已拒绝',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `idx_user_id`(`user_id`) USING BTREE
+);

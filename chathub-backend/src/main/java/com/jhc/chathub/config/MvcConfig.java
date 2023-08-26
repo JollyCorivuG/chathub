@@ -30,7 +30,8 @@ public class MvcConfig implements WebMvcConfigurer {
                         "/users/login",
                         "/users/register",
                         "/users/phone_code/**",
-                        "/users/phone_login"
+                        "/users/phone_login",
+                        "/sse/unsubscribe"
                 ).order(1);
     }
 
