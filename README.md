@@ -1,6 +1,6 @@
 # chathub - 一个简化版qq的移动端项目
 
->聊天中心项目：仿照qq移动端的UI页面，实现了qq相关的核心功能！
+>聊天中心项目：仿照 qq 移动端的 UI 页面，实现了 qq 相关的核心功能！
 >
 >前后端全栈项目 By [JollyCorivuG](https://github.com/JollyCorivuG)
 
@@ -12,7 +12,7 @@
 - 用户可以通过关键字搜索用户，并发送好友申请
 - 用户可以查看通知，同意或拒绝好友申请
 - 同一个账号只能在一个浏览器登录，否则原有账号会被强制下线
-- 用户可以修改头像、用户名等信息
+- 用户可以修改头像、用户名等个人信息
 
 ### 消息
 - 用户可以发送消息给自己的好友（支持表情包、图片、文件等多种类型）
@@ -41,13 +41,12 @@
 - Vue Router 路由管理
 
 ### 后端
-- JDK17 + Spring Boot 框架（spring boot3.1）
+- Java 8 + Spring Boot 框架（spring boot 2.6.7）
 - Spring MVC + Mybatis Plus 框架
 - Knife4j + Swagger 生成接口文档
-- mysql8.x (数据存储) + redis（缓存）
-- Netty + Websocket 实现即时通讯
+- MySQL 8.x (数据存储) + Redis（缓存）
+- Netty + WebSocket 实现即时通讯
 - SSE 实现消息列表实时刷新
 - RabbitMQ 消息队列
 - MinIO 实现文件存储
-- redis 实现分布式session
 

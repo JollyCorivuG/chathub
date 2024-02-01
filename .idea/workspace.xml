@@ -5,13 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5d32090e-3341-47da-9ec1-15d9dd10d006" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/chathub-common/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/chathub-server/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/chathub-tools/chathub-oss-starter/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/chathub-tools/chathub-oss-starter/src/main/java/bupt/edu/jhc/chathub/oss/OssProperties.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/chathub-tools/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chathub-tools/chathub-frequency-control/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chathub-server/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/chathub-server/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chathub-server/src/main/java/bupt/edu/jhc/chathub/server/chat/controller/MessageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/chathub-server/src/main/java/bupt/edu/jhc/chathub/server/chat/controller/MessageController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chathub-server/src/main/java/bupt/edu/jhc/chathub/server/user/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/chathub-server/src/main/java/bupt/edu/jhc/chathub/server/user/service/impl/UserServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,6 +36,9 @@
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
 }</component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -114,6 +117,9 @@
     ]
   }
 }]]></component>
+  <component name="ReactorSettings">
+    <option name="notificationShown" value="true" />
+  </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="E:\chathub\chathub-tools\chathub-oss-starter\src\main\resources\META-INF" />
@@ -175,8 +181,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JAR 应用程序.chathub-server-1.0-SNAPSHOT.jar" />
         <item itemvalue="Spring Boot.ChathubApplication" />
+        <item itemvalue="JAR 应用程序.chathub-server-1.0-SNAPSHOT.jar" />
         <item itemvalue="应用程序.LikeInitMain" />
         <item itemvalue="应用程序.FeedsInitMain" />
         <item itemvalue="数据库脚本.chathub.sql" />
@@ -204,11 +210,24 @@
       <workItem from="1705653457954" duration="1538000" />
       <workItem from="1705804417915" duration="9197000" />
       <workItem from="1705890388247" duration="14183000" />
+      <workItem from="1706754719249" duration="86000" />
+      <workItem from="1706754866647" duration="4709000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/chathub-tools/chathub-frequency-control/src/main/java/bupt/edu/jhc/chathub/frequency_control/service/AbstractFrequencyControlService.java</url>
+          <line>37</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

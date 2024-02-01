@@ -3,6 +3,7 @@ package bupt.edu.jhc.chathub.server.chat.controller;
 import bupt.edu.jhc.chathub.common.domain.vo.resp.CursorPageBaseResp;
 import bupt.edu.jhc.chathub.common.domain.vo.resp.Response;
 import bupt.edu.jhc.chathub.common.utils.context.RequestHolder;
+import bupt.edu.jhc.chathub.frequency_control.annotation.FrequencyControl;
 import bupt.edu.jhc.chathub.server.chat.domain.dto.MsgPageReq;
 import bupt.edu.jhc.chathub.server.chat.domain.dto.SendMsgDTO;
 import bupt.edu.jhc.chathub.server.chat.domain.vo.RoomVO;
@@ -29,6 +30,9 @@ public class MessageController {
 
     @PostMapping("/send")
     @ApiOperation("发送消息")
+    @FrequencyControl(time = 5, count = 3, target = FrequencyControl.Target.UID)
+    @FrequencyControl(time = 30, count = 5, target = FrequencyControl.Target.UID)
+    @FrequencyControl(time = 60, count = 10, target = FrequencyControl.Target.UID)
     public Response<ShowMsgVO> sendMessage(@RequestBody SendMsgDTO sendMsg) {
         Long msgId = messageService.sendMsg(RequestHolder.get().getUid(), sendMsg);
         return Response.success(messageService.convertToShowMsgVO(messageService.getById(msgId)));

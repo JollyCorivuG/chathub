@@ -17,6 +17,7 @@
         <module>chathub-server</module>
         <module>chathub-tools</module>
         <module>chathub-common</module>
+        <module>chathub-tools/chathub-frequency-control</module>
     </modules>
 
     <!--Spring Boot 2.6.7-->

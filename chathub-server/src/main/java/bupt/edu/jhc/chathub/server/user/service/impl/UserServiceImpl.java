@@ -182,7 +182,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (userMap.isEmpty()) {
             return null;
         }
-        return BeanUtil.fillBeanWithMap(userMap, new UserDTO(), false);
+        RequestInfo info = BeanUtil.fillBeanWithMap(userMap, new RequestInfo(), false);
+        UserDTO user = new UserDTO();
+        user.setId(info.getUid());
+        return user;
     }
 
     @Override
