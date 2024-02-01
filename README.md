@@ -6,7 +6,18 @@
 
 上线地址：[chathub.love](http://www.chathub.love/)
 
+## 效果展示
+
+![](E:\full_stack_project\chathub\docs\images\图片1.jpg)
+
+![](E:\full_stack_project\chathub\docs\images\图片2.jpg)
+
+![](E:\full_stack_project\chathub\docs\images\图片3.jpg)
+
+![](E:\full_stack_project\chathub\docs\images\图片4.jpg)
+
 ## 功能大全
+
 ### 用户
 - 用户注册、登录（含账号、手机验证码两种登录方式）
 - 用户可以通过关键字搜索用户，并发送好友申请
@@ -49,4 +60,8 @@
 - SSE 实现消息列表实时刷新
 - RabbitMQ 消息队列
 - MinIO 实现文件存储
+
+## 系统架构
+
+![](E:\full_stack_project\chathub\docs\images\系统架构图.jpg)
 
