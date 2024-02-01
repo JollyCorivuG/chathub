@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="5d32090e-3341-47da-9ec1-15d9dd10d006" name="更改" comment="">
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chathub-common/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chathub-server/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chathub-tools/chathub-oss-starter/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chathub-tools/chathub-oss-starter/src/main/java/bupt/edu/jhc/chathub/oss/OssProperties.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/chathub-tools/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CompilerWorkspaceConfiguration">
+    <option name="MAKE_PROJECT_ON_SAVE" value="true" />
+    <option name="PARALLEL_COMPILATION" value="true" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="FxmlFile" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="localRepository" value="F:\Tools\maven-repository" />
+        <option name="mavenHome" value="F:/Tools/apache-maven-3.9.1" />
+        <option name="useMavenConfig" value="false" />
+        <option name="userSettingsFile" value="F:\Tools\apache-maven-3.9.1\conf\settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="2ayZP2xjD8wS77y74HjR815ARFL" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
+    "JAR 应用程序.chathub-server-1.0-SNAPSHOT.jar.executor": "Run",
+    "Maven.chathub [clean].executor": "Run",
+    "Maven.chathub [install].executor": "Run",
+    "Maven.chathub [package].executor": "Run",
+    "Maven.chathub-common [clean].executor": "Run",
+    "Maven.chathub-common [install].executor": "Run",
+    "Maven.chathub-common [package].executor": "Run",
+    "Maven.chathub-oss-starter [clean].executor": "Run",
+    "Maven.chathub-oss-starter [install].executor": "Run",
+    "Maven.chathub-oss-starter [package].executor": "Run",
+    "Maven.chathub-server [clean].executor": "Run",
+    "Maven.chathub-server [compile].executor": "Run",
+    "Maven.chathub-server [package].executor": "Run",
+    "Maven.chathub-tools [clean].executor": "Run",
+    "Maven.chathub-tools [install].executor": "Run",
+    "Maven.chathub-tools [package].executor": "Run",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "Spring Boot.ChathubApplication (1).executor": "Run",
+    "Spring Boot.ChathubApplication.executor": "Run",
+    "deletionFromPopupRequiresConfirmation": "false",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "jdk.selected.JAVA_MODULE": "1.8",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "E:/chathub/chathub-tools/chathub-oss-starter/src/main/resources/META-INF",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "模块",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "MavenSettings",
+    "vue.rearranger.settings.migration": "true",
+    "应用程序.AssertUtils.executor": "Run",
+    "应用程序.FeedsInitMain.executor": "Run",
+    "应用程序.LikeInitMain.executor": "Run",
+    "数据库脚本.chathub.sql.executor": "Run"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql"
+    ],
+    "RunConfigurationTargetLRU": [
+      "3787439b-72b0-483e-ba30-82717796ffc6"
+    ]
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\chathub\chathub-tools\chathub-oss-starter\src\main\resources\META-INF" />
+      <recent name="E:\chathub\chathub-server\src\main\java\bupt\edu\jhc\chathub\server\trend\mq\like" />
+      <recent name="E:\chathub\chathub-server\src\main\java\bupt\edu\jhc\chathub\server\trend\mq\feeds" />
+      <recent name="E:\chathub\chathub-server\src\main\java\bupt\edu\jhc\chathub\server\chat\service" />
+      <recent name="E:\chathub\chathub-server\src\main\resources" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Spring Boot.ChathubApplication">
+    <configuration name="FeedsInitMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="bupt.edu.jhc.chathub.server.trend.mq.feeds.FeedsInitMain" />
+      <module name="chathub-server" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="bupt.edu.jhc.chathub.server.trend.mq.feeds.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LikeInitMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="bupt.edu.jhc.chathub.server.trend.mq.like.LikeInitMain" />
+      <module name="chathub-server" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="bupt.edu.jhc.chathub.server.trend.mq.like.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="chathub.sql" type="DatabaseScript" editBeforeRun="true" temporary="true" nameIsGenerated="true">
+      <script-file value="$PROJECT_DIR$/docs/chathub.sql" />
+      <script-mode>FILE</script-mode>
+      <data-source id="3787439b-72b0-483e-ba30-82717796ffc6" />
+      <method v="2" />
+    </configuration>
+    <configuration name="chathub-server-1.0-SNAPSHOT.jar" type="JarApplication" temporary="true">
+      <option name="JAR_PATH" value="$PROJECT_DIR$/chathub-server/target/chathub-server-1.0-SNAPSHOT.jar" />
+      <method v="2" />
+    </configuration>
+    <configuration name="ChathubApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+      <module name="chathub-server" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="bupt.edu.jhc.chathub.server.ChathubApplication" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="bupt.edu.jhc.chathub.server.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JAR 应用程序.chathub-server-1.0-SNAPSHOT.jar" />
+        <item itemvalue="Spring Boot.ChathubApplication" />
+        <item itemvalue="应用程序.LikeInitMain" />
+        <item itemvalue="应用程序.FeedsInitMain" />
+        <item itemvalue="数据库脚本.chathub.sql" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="jdk-1.8.0_392-corretto-1.8.0_392-f644763e9732-f719d367" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="5d32090e-3341-47da-9ec1-15d9dd10d006" name="更改" comment="" />
+      <created>1705292752667</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1705292752667</updated>
+      <workItem from="1705292754231" duration="10802000" />
+      <workItem from="1705369715683" duration="16343000" />
+      <workItem from="1705563925744" duration="3909000" />
+      <workItem from="1705653457954" duration="1538000" />
+      <workItem from="1705804417915" duration="9197000" />
+      <workItem from="1705890388247" duration="14183000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>
