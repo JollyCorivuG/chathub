@@ -34,6 +34,9 @@ public class RedisConstants {
     // 记录用户删除一个会话时, 当前会话的最新消息id, key为用户id:会话id
     public static final String USER_DELETE_LATEST_MESSAGE = "user:delete:latest:message:";
 
+    public static final String USER_ROOM_INFO = "user:room:info:";
+
+
     // 记录某个说说最新点赞的用户id, key为说说id
     public static final String TALK_LATEST_LIKE = "talk:latest:like:";
 }

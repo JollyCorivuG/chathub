@@ -1,19 +1,25 @@
 package bupt.edu.jhc.chathub.server.chat.service.impl;
 
-import bupt.edu.jhc.chathub.common.domain.constants.RedisConstants;
 import bupt.edu.jhc.chathub.common.domain.constants.SystemConstants;
+import bupt.edu.jhc.chathub.common.domain.enums.ErrorStatus;
 import bupt.edu.jhc.chathub.common.domain.vo.resp.CursorPageBaseResp;
 import bupt.edu.jhc.chathub.common.utils.CursorUtils;
 import bupt.edu.jhc.chathub.common.utils.context.RequestHolder;
+import bupt.edu.jhc.chathub.common.utils.exception.ThrowUtils;
 import bupt.edu.jhc.chathub.server.chat.domain.dto.MsgPageReq;
 import bupt.edu.jhc.chathub.server.chat.domain.dto.SendMsgDTO;
 import bupt.edu.jhc.chathub.server.chat.domain.entity.Message;
+import bupt.edu.jhc.chathub.server.chat.domain.entity.UserRoom;
 import bupt.edu.jhc.chathub.server.chat.domain.vo.RoomVO;
 import bupt.edu.jhc.chathub.server.chat.domain.vo.ShowMsgVO;
 import bupt.edu.jhc.chathub.server.chat.event.MessageSendEvent;
 import bupt.edu.jhc.chathub.server.chat.mapper.MessageMapper;
+import bupt.edu.jhc.chathub.server.chat.mapper.UserRoomMapper;
 import bupt.edu.jhc.chathub.server.chat.service.IMessageService;
+import bupt.edu.jhc.chathub.server.chat.service.IRoomService;
 import bupt.edu.jhc.chathub.server.chat.service.adapter.MsgAdapter;
+import bupt.edu.jhc.chathub.server.chat.service.cache.RoomLatestMsgCache;
+import bupt.edu.jhc.chathub.server.chat.service.cache.UserRoomCache;
 import bupt.edu.jhc.chathub.server.chat.service.strategy.AbstractMsgHandler;
 import bupt.edu.jhc.chathub.server.chat.service.strategy.MsgHandlerFactory;
 import bupt.edu.jhc.chathub.server.friend.service.IFriendService;
@@ -25,10 +31,12 @@ import bupt.edu.jhc.chathub.server.user.service.IUserService;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -59,17 +67,43 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     @Resource
     private IGroupService groupService;
 
+    @Resource
+    private RoomLatestMsgCache roomLatestMsgCache;
+
+    @Resource
+    private UserRoomCache userRoomCache;
+
+    @Resource
+    private IRoomService roomService;
+
+    @Resource
+    private UserRoomMapper userRoomMapper;
+
     @Override
     public void updateUserReadLatestMsg(Long userId, Long roomId, Long msgId) {
-        String userLatestMsgKey = RedisConstants.USER_READ_LATEST_MESSAGE + userId + ":" + roomId;
-        if (Boolean.FALSE.equals(stringRedisTemplate.hasKey(userLatestMsgKey))) {
-            stringRedisTemplate.opsForValue().set(userLatestMsgKey, String.valueOf(msgId));
+//        String userLatestMsgKey = RedisConstants.USER_READ_LATEST_MESSAGE + userId + ":" + roomId;
+//        if (Boolean.FALSE.equals(stringRedisTemplate.hasKey(userLatestMsgKey))) {
+//            stringRedisTemplate.opsForValue().set(userLatestMsgKey, String.valueOf(msgId));
+//        } else {
+//            Long userLatestMsgId = Long.valueOf(Objects.requireNonNull(stringRedisTemplate.opsForValue().get(userLatestMsgKey)));
+//            if (msgId > userLatestMsgId) {
+//                stringRedisTemplate.opsForValue().set(userLatestMsgKey, String.valueOf(msgId));
+//            }
+//        }
+        QueryWrapper<UserRoom> userRoomQueryWrapper = new QueryWrapper<>();
+        userRoomQueryWrapper.eq("user_id", userId).eq("room_id", roomId);
+        UserRoom userRoom = userRoomMapper.selectList(userRoomQueryWrapper).isEmpty() ? null : userRoomMapper.selectList(userRoomQueryWrapper).get(0);
+        if (Objects.isNull(userRoom)) {
+            userRoom = new UserRoom();
+            userRoom.setUserId(userId).setRoomId(roomId).setLatestReadMsgId(msgId);
+            userRoomMapper.insert(userRoom);
         } else {
-            Long userLatestMsgId = Long.valueOf(Objects.requireNonNull(stringRedisTemplate.opsForValue().get(userLatestMsgKey)));
-            if (msgId > userLatestMsgId) {
-                stringRedisTemplate.opsForValue().set(userLatestMsgKey, String.valueOf(msgId));
+            if (msgId > userRoom.getLatestReadMsgId()) {
+                userRoom.setLatestReadMsgId(msgId);
+                userRoomMapper.updateById(userRoom);
             }
         }
+        userRoomCache.del(new Pair<>(userId, roomId));
     }
 
     @Override
@@ -78,6 +112,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     }
 
     @Override
+    @Transactional
     public Long sendMsg(Long userId, SendMsgDTO sendMsg) {
         // 1.将sendMsg转换为Message对象并保存到数据库
         AbstractMsgHandler msgHandler = MsgHandlerFactory.getStrategy(sendMsg.getMsgType());
@@ -86,7 +121,14 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         save(save);
 
         // 2.更新redis中房间最新消息id以及用户最新读取消息id
-        stringRedisTemplate.opsForValue().set(RedisConstants.ROOM_LATEST_MESSAGE + sendMsg.getRoomId(), String.valueOf(save.getId()));
+//        stringRedisTemplate.opsForValue().set(RedisConstants.ROOM_LATEST_MESSAGE + sendMsg.getRoomId(), String.valueOf(save.getId()));
+        // 更新房间最新消息 id
+        ThrowUtils.throwIf(!roomService.update()
+                .eq("id", sendMsg.getRoomId())
+                .set("latest_msg_id", save.getId())
+                .update(), ErrorStatus.SYSTEM_ERROR, "更新房间最新消息失败");
+        // 删除缓存
+        roomLatestMsgCache.del(sendMsg.getRoomId());
         updateUserReadLatestMsg(userId, sendMsg.getRoomId(), save.getId());
 
         // 3.发布消息发送事件
@@ -115,23 +157,26 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         List<RoomVO> rooms = new ArrayList<>();
         friendIds.forEach(friendId -> {
             Long roomId = friendService.getRoomId(selfId, friendId);
-            String latestMsgId = stringRedisTemplate.opsForValue().get(RedisConstants.ROOM_LATEST_MESSAGE + roomId);
-            if (latestMsgId == null) {
+//            String latestMsgId = stringRedisTemplate.opsForValue().get(RedisConstants.ROOM_LATEST_MESSAGE + roomId);
+            Long latestMsgId = roomLatestMsgCache.get(roomId);
+            if (Objects.isNull(latestMsgId)) {
                 return;
             }
-            String latestDeleteMsgId = stringRedisTemplate.opsForValue().get(RedisConstants.USER_DELETE_LATEST_MESSAGE + selfId + ":" + roomId);
-            if (latestDeleteMsgId != null && Long.parseLong(latestDeleteMsgId) >= Long.parseLong(latestMsgId)) {
+
+            UserRoom userRoom = userRoomCache.get(new Pair<>(selfId, roomId));
+//            String latestDeleteMsgId = stringRedisTemplate.opsForValue().get(RedisConstants.USER_DELETE_LATEST_MESSAGE + selfId + ":" + roomId);
+            if (userRoom.getLatestDelMsgId() != null && userRoom.getLatestDelMsgId() >= latestMsgId) {
                 return;
             }
-            ShowMsgVO message = convertToShowMsgVO(getById(Long.parseLong(latestMsgId)));
-            String latestReadMsgId = stringRedisTemplate.opsForValue().get(RedisConstants.USER_READ_LATEST_MESSAGE + selfId + ":" + roomId);
+            ShowMsgVO message = convertToShowMsgVO(getById(latestMsgId));
+//            String latestReadMsgId = stringRedisTemplate.opsForValue().get(RedisConstants.USER_READ_LATEST_MESSAGE + selfId + ":" + roomId);
+            Long latestReadMsgId = userRoom.getLatestReadMsgId();
             QueryWrapper<Message> wrapper = new QueryWrapper<>();
-            if (latestReadMsgId != null) {
+            if (!Objects.isNull(latestReadMsgId)) {
                 wrapper.gt("id", latestReadMsgId);
             }
             wrapper.eq("room_id", roomId);
             long unreadCount = count(wrapper);
-
             UserVO friendInfo = userService.convertUserToUserVO(selfId, userService.getById(friendId));
             RoomVO room = new RoomVO();
             room.setId(roomId)
@@ -149,16 +194,20 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         groupIds.forEach(groupId -> {
             Group group = groupService.getById(groupId);
             Long roomId = group.getRoomId();
-            String latestMsgId = stringRedisTemplate.opsForValue().get(RedisConstants.ROOM_LATEST_MESSAGE + roomId);
-            if (latestMsgId == null) {
+//            String latestMsgId = stringRedisTemplate.opsForValue().get(RedisConstants.ROOM_LATEST_MESSAGE + roomId);
+            Long latestMsgId = roomLatestMsgCache.get(roomId);
+            if (Objects.isNull(latestMsgId)) {
                 return;
             }
-            String latestDeleteMsgId = stringRedisTemplate.opsForValue().get(RedisConstants.USER_DELETE_LATEST_MESSAGE + selfId + ":" + roomId);
-            if (latestDeleteMsgId != null && Long.parseLong(latestDeleteMsgId) >= Long.parseLong(latestMsgId)) {
+
+            UserRoom userRoom = userRoomCache.get(new Pair<>(selfId, roomId));
+//            String latestDeleteMsgId = stringRedisTemplate.opsForValue().get(RedisConstants.USER_DELETE_LATEST_MESSAGE + selfId + ":" + roomId);
+            if (userRoom.getLatestDelMsgId() != null && userRoom.getLatestDelMsgId() >= latestMsgId) {
                 return;
             }
-            ShowMsgVO message = convertToShowMsgVO(getById(Long.parseLong(latestMsgId)));
-            String latestReadMsgId = stringRedisTemplate.opsForValue().get(RedisConstants.USER_READ_LATEST_MESSAGE + selfId + ":" + roomId);
+            ShowMsgVO message = convertToShowMsgVO(getById(latestMsgId));
+//            String latestReadMsgId = stringRedisTemplate.opsForValue().get(RedisConstants.USER_READ_LATEST_MESSAGE + selfId + ":" + roomId);
+            Long latestReadMsgId = userRoom.getLatestReadMsgId();
             QueryWrapper<Message> wrapper = new QueryWrapper<>();
             if (latestReadMsgId != null) {
                 wrapper.gt("id", latestReadMsgId);
@@ -203,8 +252,15 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
 
     @Override
     public void deleteRoom(Long userId, Long roomId) {
-        String key = RedisConstants.USER_DELETE_LATEST_MESSAGE + userId + ":" + roomId;
-        Long roomCurLatestMsgId = Long.valueOf(Objects.requireNonNull(stringRedisTemplate.opsForValue().get(RedisConstants.ROOM_LATEST_MESSAGE + roomId)));
-        stringRedisTemplate.opsForValue().set(key, String.valueOf(roomCurLatestMsgId));
+//        String key = RedisConstants.USER_DELETE_LATEST_MESSAGE + userId + ":" + roomId;
+//        Long roomCurLatestMsgId = Long.valueOf(Objects.requireNonNull(stringRedisTemplate.opsForValue().get(RedisConstants.ROOM_LATEST_MESSAGE + roomId)));
+//        stringRedisTemplate.opsForValue().set(key, String.valueOf(roomCurLatestMsgId));
+        QueryWrapper<UserRoom> userRoomQueryWrapper = new QueryWrapper<>();
+        userRoomQueryWrapper.eq("user_id", userId).eq("room_id", roomId);
+        UserRoom userRoom = userRoomMapper.selectList(userRoomQueryWrapper).isEmpty() ? null : userRoomMapper.selectList(userRoomQueryWrapper).get(0);
+        ThrowUtils.throwIf(userRoom == null, ErrorStatus.PARAMS_ERROR, "用户房间信息不存在");
+        userRoom.setLatestDelMsgId(roomLatestMsgCache.get(roomId));
+        userRoomMapper.updateById(userRoom);
+        userRoomCache.del(new Pair<>(userId, roomId));
     }
 }

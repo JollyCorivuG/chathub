@@ -62,9 +62,23 @@ DROP TABLE IF EXISTS `tb_room`;
 CREATE TABLE `tb_room`  (
     `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
     `room_type` tinyint NOT NULL COMMENT '会话类型 0-单聊 1-群聊',
+    `latest_msg_id` bigint(20) NOT NULL DEFAULT 0 COMMENT '房间最新消息id',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`) USING BTREE
+);
+
+DROP TABLE IF EXISTS `tb_user_room`;
+CREATE TABLE `tb_user_room`  (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `user_id` bigint(20) NOT NULL COMMENT '用户 id',
+    `room_id` bigint(20) NOT NULL COMMENT '房间 id',
+    `latest_del_msg_id` bigint(20) NOT NULL DEFAULT 0 COMMENT '最新删除 id',
+    `latest_read_msg_id` bigint(20) NOT NULL COMMENT '最新已读 id',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `idx_user_room_id`(`user_id`, `room_id`) USING BTREE
 );
 
 DROP TABLE IF EXISTS `tb_feeds`;

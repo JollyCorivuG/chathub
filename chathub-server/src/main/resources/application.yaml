@@ -21,11 +21,8 @@ spring:
     username: ${chathub.mysql.username}
     password: ${chathub.mysql.password}
     hikari:
-      # 最小空闲连接数量
       minimum-idle: 3
-      # 最大连接池数量
       maximum-pool-size: 10
-      # 连接超时时间
       max-lifetime: 30000
       connection-test-query: SELECT 1
   rabbitmq:
@@ -41,13 +38,9 @@ spring:
     password: ${chathub.redis.password}
     lettuce:
       pool:
-        # 最大阻塞等待时间，负数表示没有限制
         max-wait: -1
-        # 连接池中的最大空闲连接
         max-idle: 5
-        # 连接池中的最小空闲连接
         min-idle: 0
-        # 连接池中最大连接数，负数表示没有限制
         max-active: 20
   jackson:
     default-property-inclusion: non_null
