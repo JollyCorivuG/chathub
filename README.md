@@ -8,13 +8,13 @@
 
 ## 效果展示
 
-![](E:\full_stack_project\chathub\docs\images\图片1.jpg)
+![](https://github.com/JollyCorivuG/chathub/blob/main/docs/images/图片1.jpg)
 
-![](E:\full_stack_project\chathub\docs\images\图片2.jpg)
+![](https://github.com/JollyCorivuG/chathub/blob/main/docs/images/图片2.jpg)
 
-![](E:\full_stack_project\chathub\docs\images\图片3.jpg)
+![](https://github.com/JollyCorivuG/chathub/blob/main/docs/images/图片3.jpg)
 
-![](E:\full_stack_project\chathub\docs\images\图片4.jpg)
+![](https://github.com/JollyCorivuG/chathub/blob/main/docs/images/图片4.jpg)
 
 ## 功能大全
 
@@ -63,5 +63,5 @@
 
 ## 系统架构
 
-![](E:\full_stack_project\chathub\docs\images\系统架构图.jpg)
+![](https://github.com/JollyCorivuG/chathub/blob/main/docs/images/系统架构图.jpg)
 
