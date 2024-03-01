@@ -7,7 +7,9 @@ import bupt.edu.jhc.chathub.common.domain.vo.resp.Response;
 import bupt.edu.jhc.chathub.common.utils.context.RequestHolder;
 import bupt.edu.jhc.chathub.common.utils.exception.ThrowUtils;
 import bupt.edu.jhc.chathub.server.chat.domain.entity.Room;
+import bupt.edu.jhc.chathub.server.chat.domain.entity.UserRoom;
 import bupt.edu.jhc.chathub.server.chat.mapper.RoomMapper;
+import bupt.edu.jhc.chathub.server.chat.mapper.UserRoomMapper;
 import bupt.edu.jhc.chathub.server.friend.domain.dto.FriendApplication;
 import bupt.edu.jhc.chathub.server.friend.domain.dto.FriendApplicationReply;
 import bupt.edu.jhc.chathub.server.friend.domain.entity.FriendNotice;
@@ -44,6 +46,9 @@ public class FriendServiceImpl extends ServiceImpl<FriendRelationMapper, FriendR
 
     @Resource
     private RoomMapper roomMapper;
+
+    @Resource
+    private UserRoomMapper userRoomMapper;
 
     private boolean isFriend(Long selfId, Long otherId) {
         String key = RedisConstants.USER_FRIEND_KEY + selfId;
@@ -147,6 +152,16 @@ public class FriendServiceImpl extends ServiceImpl<FriendRelationMapper, FriendR
             FriendNotice otherNotice = new FriendNotice();
             otherNotice.setStatusInfo(SystemConstants.NOTICE_STATUS_PASS);
             friendNoticeMapper.update(otherNotice, queryWrapper);
+
+            // 3.5创建 userRoom
+            UserRoom userRoom1 = new UserRoom();
+            userRoom1.setRoomId(room.getId())
+                    .setUserId(selfId);
+            UserRoom userRoom2 = new UserRoom();
+            userRoom2.setRoomId(room.getId())
+                    .setUserId(otherId);
+            userRoomMapper.insert(userRoom1);
+            userRoomMapper.insert(userRoom2);
         }
         return Response.success(null);
     }

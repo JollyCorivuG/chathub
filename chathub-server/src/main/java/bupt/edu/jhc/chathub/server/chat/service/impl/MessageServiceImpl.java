@@ -22,6 +22,7 @@ import bupt.edu.jhc.chathub.server.chat.service.cache.RoomLatestMsgCache;
 import bupt.edu.jhc.chathub.server.chat.service.cache.UserRoomCache;
 import bupt.edu.jhc.chathub.server.chat.service.strategy.AbstractMsgHandler;
 import bupt.edu.jhc.chathub.server.chat.service.strategy.MsgHandlerFactory;
+import bupt.edu.jhc.chathub.server.friend.domain.entity.FriendRelation;
 import bupt.edu.jhc.chathub.server.friend.service.IFriendService;
 import bupt.edu.jhc.chathub.server.group.domain.entity.Group;
 import bupt.edu.jhc.chathub.server.group.domain.vo.GroupVO;
@@ -131,10 +132,19 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         roomLatestMsgCache.del(sendMsg.getRoomId());
         updateUserReadLatestMsg(userId, sendMsg.getRoomId(), save.getId());
 
-        // 3.发布消息发送事件
+        // 3.如果这是第一次发送消息, 则需要判断是否需要创建房间(处理对方不在 ws 连接的情况)
+        FriendRelation fl = friendService.lambdaQuery().eq(FriendRelation::getRoomId, sendMsg.getRoomId()).one();
+        UserRoom userRoom = userRoomMapper.selectOne(new QueryWrapper<UserRoom>().eq("user_id", fl.getUserId1() - userId + fl.getUserId2()).eq("room_id", sendMsg.getRoomId()));
+        if (Objects.isNull(userRoom)) {
+            userRoom = new UserRoom();
+            userRoom.setUserId(fl.getUserId1() - userId + fl.getUserId2()).setRoomId(sendMsg.getRoomId()).setLatestReadMsgId(save.getId());
+            userRoomMapper.insert(userRoom);
+        }
+
+        // 4.发布消息发送事件
         applicationEventPublisher.publishEvent(new MessageSendEvent(this, save.getId()));
 
-        // 4.返回保存的消息
+        // 5.返回保存的消息
         return save.getId();
     }
 

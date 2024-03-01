@@ -1,3 +1,8 @@
+########## 刷新权限 ##########
+# use mysql;
+# update user set Insert_priv='Y',Update_priv='Y',Delete_priv='Y',Create_priv='Y',Drop_priv='Y' where user = 'root' and host = '%';
+# flush privileges;
+
 CREATE DATABASE chathub DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 use chathub;
 
@@ -74,7 +79,7 @@ CREATE TABLE `tb_user_room`  (
     `user_id` bigint(20) NOT NULL COMMENT '用户 id',
     `room_id` bigint(20) NOT NULL COMMENT '房间 id',
     `latest_del_msg_id` bigint(20) NOT NULL DEFAULT 0 COMMENT '最新删除 id',
-    `latest_read_msg_id` bigint(20) NOT NULL COMMENT '最新已读 id',
+    `latest_read_msg_id` bigint(20) NOT NULL DEFAULT 0 COMMENT '最新已读 id',
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`) USING BTREE,
