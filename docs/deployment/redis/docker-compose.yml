@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  redis:
+    image: redis:6.2.6
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - /data/redis/redis.conf:/etc/redis/redis.conf
+      - /data/redis/data:/data
+      - /data/redis/logs:/logs
+    command: ["redis-server","/etc/redis/redis.conf"]

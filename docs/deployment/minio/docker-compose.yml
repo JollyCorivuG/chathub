@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  minio:
+    image: "quay.io/minio/minio"
+    container_name: minio
+    ports:
+      - "9000:9000" # api 端口
+      - "9001:9001" # 控制台端口
+    environment:
+      TZ: Asia/Shanghai # 时区上海
+      MINIO_ROOT_USER: admin # 管理后台用户名
+      MINIO_ROOT_PASSWORD: 87654321 # 管理后台密码，最小8个字符
+      MINIO_COMPRESS: "off" # 开启压缩 on 开启 off 关闭
+      MINIO_COMPRESS_EXTENSIONS: "" # 扩展名 .pdf,.doc 为空 所有类型均压缩
+      MINIO_COMPRESS_MIME_TYPES: "" # mime 类型 application/pdf 为空 所有类型均压缩
+    volumes:
+      - /data/minio/data:/data/ # 映射当前目录下的data目录至容器内/data目录
+      - /data/minio/config:/root/.minio/ # 映射配置目录
+    command: server --address ':9000' --console-address ':9001' /data  # 指定容器中的目录 /data
+    privileged: true

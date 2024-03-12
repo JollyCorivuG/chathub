@@ -5,6 +5,7 @@ import bupt.edu.jhc.chathub.server.websocket.domain.req.WSReqDTO;
 import bupt.edu.jhc.chathub.server.websocket.service.IWebSocketService;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
@@ -72,5 +73,12 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
                 break;
             }
         }
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        log.error("NettyWebSocketServerHandler Exception!", cause);
+        Channel channel = ctx.channel();
+        if (channel.isActive()) ctx.close();
     }
 }

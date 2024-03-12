@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+  rabbitmq:
+    image: rabbitmq:3-management # 镜像版本
+    container_name: rabbitmq
+    restart: always
+    volumes:
+      - ./data/:/var/lib/rabbitmq/
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin # 默认管理员账号
+      - RABBITMQ_DEFAULT_PASS=admin123 # 默认管理密码
